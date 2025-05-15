@@ -23,7 +23,7 @@ export default function Choice(){
           title: "Upload Contract",
           description:
             "Already have a smart contract ready? Upload it for a thorough validation process. Once verified, the contract is securely published to the blockchain, ensuring trust and immutability.",
-            path: "/up_",  
+            path: "/up_con",  
         },
       ];
     return(
