@@ -1,0 +1,38 @@
+# Global
+.DS_Store
+.env
+*.log
+
+# Node (Next.js frontend)
+frontend/node_modules
+frontend/.next
+frontend/.env.local
+
+# Python (FastAPI backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+backend/.env
+backend/__pycache__/
+backend/env/
+backend/venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Ignore media and binary files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.docx
+*.pptx
+*.xlsx
+*.mp4
+*.avi
+*.mov
+*.psd
