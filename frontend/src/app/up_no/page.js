@@ -25,10 +25,34 @@ export default function Notes() {
     fileInputRef.current.click();
   };
 
-  const processDocx = () => {
+  const processDocx = async () => {
     if (!file) return;
-    alert(`Processing ${file.name}...`);
-    // TODO: Replace with actual AI processing logic
+  
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('guideline_path', 'guidelines/nda_ma_guidelines.md'); // or your custom path
+  
+    try {
+      const response = await fetch('http://localhost:8000/generate-document/', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to process the document');
+      }
+  
+      // Download the file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${file.name.replace('.docx', '_structured.docx')}`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
   };
 
   return (
