@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ contract_type | capitalize }} Agreement</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }
+        h1, h2 { color: #2E4053; }
+        p { margin-bottom: 15px; }
+        .signature { margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <h1>{{ contract_type | capitalize }} Agreement</h1>
+    
+    <p>This {{ contract_type }} Agreement ("Agreement") is made and entered into by and between:</p>
+    
+    <p><strong>Party A:</strong> {{ party_1 }}</p>
+    <p><strong>Party B:</strong> {{ party_2 }}</p>
+    
+    <h2>Recitals</h2>
+    <p>WHEREAS, the parties wish to {{ "acquire" if contract_type == "acquisition" else "merge their businesses" }} under the terms set forth herein;</p>
+    
+    <h2>Terms and Conditions</h2>
+    
+    <h3>1. Effective Date</h3>
+    <p>This Agreement shall be effective as of {{ effective_date }}.</p>
+    
+    {% if contract_type == "acquisition" %}
+    <h3>2. Purchase Price</h3>
+    <p>The purchase price for the acquisition shall be {{ contract_amount }}.</p>
+    
+    <h3>3. Closing</h3>
+    <p>The closing of the acquisition shall occur on a date mutually agreed upon by the parties.</p>
+    {% elif contract_type == "merger" %}
+    <h3>2. Merger Terms</h3>
+    <p>The parties agree to merge their businesses under the following terms and conditions:</p>
+    <ul>
+        <li>The merged entity will operate under a mutually agreed name.</li>
+        <li>Ownership interests and management responsibilities will be shared as agreed.</li>
+        <li>Any other specific merger conditions can be outlined here.</li>
+    </ul>
+    {% endif %}
+    
+    <h3>4. Term</h3>
+    <p>The term of this Agreement is {{ term_length }}.</p>
+    
+    <h3>5. Governing Law</h3>
+    <p>This Agreement shall be governed by and construed in accordance with the laws of {{ governing_law }}.</p>
+    
+    <div class="signature">
+        <p>IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</p>
+        <p>__________________________<br>
+        Authorized Signatory<br>
+        {{ party_1 }}</p>
+        
+        <p>__________________________<br>
+        Authorized Signatory<br>
+        {{ party_2 }}</p>
+    </div>
+</body>
+</html>

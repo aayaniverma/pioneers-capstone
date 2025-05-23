@@ -6,6 +6,7 @@ import { FiArrowRight } from 'react-icons/fi'; // Arrow icon
 export default function Notes() {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -28,21 +29,20 @@ export default function Notes() {
   const processDocx = async () => {
     if (!file) return;
   
+    setLoading(true);  // Show loading state
+  
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('guideline_path', 'guidelines/nda_ma_guidelines.md'); // or your custom path
+    formData.append('guideline_path', 'guidelines/nda_ma_guidelines.md');
   
     try {
-      const response = await fetch('http://localhost:8000/generate-document/', {
+      const response = await fetch('http://localhost:8000/api/generate-document/', {
         method: 'POST',
         body: formData,
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to process the document');
-      }
+      if (!response.ok) throw new Error('Failed to process the document');
   
-      // Download the file
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -52,8 +52,11 @@ export default function Notes() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       alert(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);  // Hide loading state
     }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gray-50">
@@ -94,6 +97,9 @@ export default function Notes() {
           >
             <FiArrowRight size={32} />
           </button>
+          {loading && (
+          <p className="mt-4 text-blue-600 text-sm sm:text-base">Processing document...</p>
+          )}
         </div>
       )}
     </div>

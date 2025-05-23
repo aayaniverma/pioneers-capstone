@@ -1,24 +1,17 @@
-from utils.io_handler import read_docx, write_docx
-from utils.prompt_builder import build_prompt
-from utils.openai_client import generate_output
-from utils.date_checker import ensure_date_in_prompt
-from datetime import datetime
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from routes import doc_generator, contract_generator
 
-input_path = "input_docs/sample_input.docx"
-output_path = "output_docs/structured_output.docx"
-guideline_path = "guidelines/nda_ma_guidelines.md"
+app = FastAPI()
 
-raw_notes = read_docx(input_path)
-prompt = build_prompt(guideline_path, raw_notes)
-prompt = ensure_date_in_prompt(prompt)
+# Allow requests from your frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Use specific domain in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-structured_doc = generate_output(prompt)
-
-# ✨ Replace placeholders with actual values
-current_date = datetime.today().strftime("%B %d, %Y")
-structured_doc = structured_doc.replace("[Effective Date]", current_date)
-structured_doc = structured_doc.replace("[Date]", current_date)
-
-write_docx(structured_doc, output_path)
-
-print("Structured documentation generated successfully.")
+app.include_router(doc_generator.router, prefix="/api")
+app.include_router(contract_generator.router, prefix="/api")

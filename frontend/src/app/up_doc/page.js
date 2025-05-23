@@ -6,6 +6,7 @@ import { FiArrowRight } from 'react-icons/fi'; // Arrow icon
 export default function Doc() {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -25,10 +26,30 @@ export default function Doc() {
     fileInputRef.current.click();
   };
 
-  const processDocx = () => {
+  const processDocx = async () => {
     if (!file) return;
-    alert(`Processing ${file.name}...`);
-    // TODO: Replace with actual AI processing logic
+    setLoading(true);
+  
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      const res = await fetch("http://localhost:8000/api/generate-contract/", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!res.ok) {
+        throw new Error("Failed to process document");
+      }
+  
+      const data = await res.json();
+      alert(data.message);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,6 +91,10 @@ export default function Doc() {
           >
             <FiArrowRight size={32} />
           </button>
+          {loading && (
+          <p className="mt-4 text-blue-600 text-sm sm:text-base">Processing document...</p>
+          )}
+
         </div>
       )}
     </div>
