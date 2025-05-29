@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { FiArrowRight } from 'react-icons/fi'; // Arrow icon
+import { FiArrowRight } from 'react-icons/fi';
 
 export default function Cont() {
   const [fileName, setFileName] = useState('');
   const [file, setFile] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -14,10 +16,12 @@ export default function Cont() {
     if (selectedFile && selectedFile.name.endsWith('.docx')) {
       setFileName(selectedFile.name);
       setFile(selectedFile);
+      setIsVerified(false); // Reset if new file uploaded
     } else {
       alert('Please upload a valid .docx file.');
       setFileName('');
       setFile(null);
+      setIsVerified(false);
     }
   };
 
@@ -25,10 +29,21 @@ export default function Cont() {
     fileInputRef.current.click();
   };
 
-  const processDocx = () => {
+  const verifyContract = async () => {
     if (!file) return;
-    alert(`Processing ${file.name}...`);
-    // TODO: Replace with actual AI processing logic
+    setLoading(true);
+
+    // Simulated async verification
+    setTimeout(() => {
+      alert(`Contract "${file.name}" verified successfully.`);
+      setIsVerified(true);
+      setLoading(false);
+    }, 2000);
+  };
+
+  const uploadToBlockchain = () => {
+    alert(`Contract "${file.name}" uploaded to blockchain!`);
+    // TODO: Add real blockchain interaction here
   };
 
   return (
@@ -37,7 +52,6 @@ export default function Cont() {
         Upload Your Contract (.docx)
       </h1>
 
-      {/* Hidden File Input */}
       <input
         type="file"
         accept=".docx"
@@ -46,7 +60,6 @@ export default function Cont() {
         className="hidden"
       />
 
-      {/* Upload Button */}
       <button
         onClick={handleUploadClick}
         className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition-colors text-base sm:text-lg"
@@ -54,7 +67,6 @@ export default function Cont() {
         Upload .docx
       </button>
 
-      {/* Uploaded File Preview */}
       {fileName && (
         <div className="mt-6 flex flex-col items-center space-y-4 w-full max-w-md">
           <div className="flex items-center space-x-3 bg-white px-4 py-3 rounded shadow w-full">
@@ -62,14 +74,25 @@ export default function Cont() {
             <p className="text-gray-700 text-sm sm:text-base truncate">{fileName}</p>
           </div>
 
-          {/* Arrow to Proceed */}
-          <button
-            onClick={processDocx}
-            className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
-            title="Proceed to next step"
-          >
-            <FiArrowRight size={32} />
-          </button>
+          {/* Verify Button */}
+          {!isVerified && (
+            <button
+              onClick={verifyContract}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition-all"
+            >
+              {loading ? 'Verifying...' : 'Verify Contract'}
+            </button>
+          )}
+
+          {/* Upload to Blockchain Button */}
+          {isVerified && (
+            <button
+              onClick={uploadToBlockchain}
+              className="bg-purple-600 text-white px-6 py-2 rounded-lg shadow hover:bg-purple-700 transition-all"
+            >
+              Upload to Blockchain
+            </button>
+          )}
         </div>
       )}
     </div>
