@@ -1,4 +1,20 @@
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
 from docx import Document
+import shutil
+import os
+from io import BytesIO
+import traceback
+
+router = APIRouter()
+
+UPLOAD_FOLDER = "./output_contracts"
+VERIFIED_FOLDER = "./verified_con"
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+if not os.path.exists(VERIFIED_FOLDER):
+    os.makedirs(VERIFIED_FOLDER)
 
 def extract_text_from_docx(docx_path):
     # docx_path should be a path string, not a file object
@@ -83,10 +99,10 @@ def verify_contract_guidelines(context):
 # --- Main script ---
 
 # Use your full absolute path here:
-output_contracts = "/Users/riyamathur/Desktop/pioneers-capstone/backend/output_contracts/generated_contract.docx"
+#output_contracts = "D:/spaceeeee/pioneers-capstone/backend/output_contracts/generated_contract.docx"
 
 # Extract raw contract text from docx file path
-contract_text = extract_text_from_docx(output_contracts)
+#contract_text = extract_text_from_docx(output_contracts)
 
 # Your function to parse structured context from contract text
 def extract_context_from_text(text):
@@ -113,11 +129,58 @@ def extract_context_from_text(text):
     }
 
 # Extract structured context from raw contract text
-context = extract_context_from_text(contract_text)
+#context = extract_context_from_text(contract_text)
 
 # Run contract guideline verification
-verification_results = verify_contract_guidelines(context)
+#verification_results = verify_contract_guidelines(context)
 
 # Print verification results
-for result in verification_results:
-    print(result)
+#for result in verification_results:
+ #   print(result)
+@router.post("/verify-contract")
+async def verify_contract(file: UploadFile = File(...)):
+    # Save uploaded file temporarily in output_contracts
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+    # Step 2: Generate custom filename like myfile_uploaded.docx
+    original_name = file.filename
+    base_name, ext = os.path.splitext(original_name)
+    custom_name = f"{base_name}_uploaded{ext}"
+    upload_path = os.path.join(UPLOAD_FOLDER, custom_name)
+
+    try:
+        with open(upload_path, "wb") as buffer:
+            buffer.write(await file.read())
+        file.file.close()    
+
+        # Extract text and context
+        contract_text = extract_text_from_docx(upload_path)
+        context = extract_context_from_text(contract_text)
+
+        # Run verification
+        results = verify_contract_guidelines(context)
+
+        if results and not results[0].startswith("✅"):
+            os.remove(upload_path)
+            return JSONResponse(status_code=400, content={"success": False, "errors": results})
+
+        # If passed, move to verified folder
+        verified_filename = f"verified_{original_name}"
+        verified_path = os.path.join(VERIFIED_FOLDER, verified_filename)
+        shutil.move(upload_path, verified_path)
+
+        return {
+            "success": True,
+            "message": "Contract verified successfully.",
+            "verified_file": verified_filename,
+            "results": results
+        }
+
+    except Exception as e:
+        traceback.print_exc()  # <- Add this line to log full traceback
+        if os.path.exists(upload_path):
+            try:
+                os.remove(upload_path)
+            except Exception:
+                pass
+        return JSONResponse(status_code=500, content={"success": False, "errors": [str(e)]})

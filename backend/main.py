@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import doc_generator, contract_generator
+from routes import doc_generator, contract_generator, verification
 
 app = FastAPI()
 
@@ -15,3 +15,4 @@ app.add_middleware(
 
 app.include_router(doc_generator.router, prefix="/api")
 app.include_router(contract_generator.router, prefix="/api")
+app.include_router(verification.router, prefix="/api")

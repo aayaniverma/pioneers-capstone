@@ -8,6 +8,8 @@ export default function Cont() {
   const [file, setFile] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verificationResult, setVerificationResult] = useState(null);
+
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -31,14 +33,34 @@ export default function Cont() {
 
   const verifyContract = async () => {
     if (!file) return;
+
     setLoading(true);
 
-    // Simulated async verification
-    setTimeout(() => {
-      alert(`Contract "${file.name}" verified successfully.`);
-      setIsVerified(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('http://localhost:8000/api/verify-contract', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setVerificationResult({ success: true, message: data.message });
+        setIsVerified(true);
+        alert("✅ Verified successfully!");
+      } else {
+        const errData = await res.json();
+        setVerificationResult({ success: false, errors: errData.errors });
+        setIsVerified(false);
+      }
+    } catch (error) {
+      setVerificationResult({ success: false, errors: [error.message] });
+      setIsVerified(false);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const uploadToBlockchain = () => {
@@ -93,6 +115,8 @@ export default function Cont() {
               Upload to Blockchain
             </button>
           )}
+
+          
         </div>
       )}
     </div>

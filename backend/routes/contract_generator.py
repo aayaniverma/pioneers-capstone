@@ -265,7 +265,22 @@ def generate_contract_from_structured_doc(structured_doc_path, templates_dir, ou
 
     print("🧩 Rendering contract (DOCX)...")
     doc = DocxTemplate(template_path)
-    doc.render(data)
+    def sanitize_value(val):
+        if not val or not val.strip():
+            return "N/A"
+        return val.replace("\n", " ").strip()
+
+    safe_data = {k: sanitize_value(v) for k, v in data.items()}
+    empty_fields = [k for k, v in data.items() if not v.strip()]
+    if empty_fields:
+        print(f"⚠️ Warning: The following fields were empty and replaced with 'N/A': {empty_fields}")
+    safe_data = {k: (v.strip() if v.strip() else "N/A") for k, v in data.items()}
+
+    try:
+        doc.render(safe_data)
+    except Exception as e:
+        print(f"❌ Rendering failed: {e}")
+        raise e
     os.makedirs(os.path.dirname(output_contract_path), exist_ok=True)
     doc.save(output_contract_path)
 
