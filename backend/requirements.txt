@@ -7,3 +7,5 @@ fitz
 jinja2
 weasyprint
 openai
+pydantic
+
