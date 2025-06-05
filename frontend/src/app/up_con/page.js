@@ -63,10 +63,34 @@ export default function Cont() {
     }
   };
 
-  const uploadToBlockchain = () => {
-    alert(`Contract "${file.name}" uploaded to blockchain!`);
-    // TODO: Add real blockchain interaction here
+  const uploadToBlockchain = async () => {
+    if (!file) return;
+  
+    try {
+      const res = await fetch('http://localhost:8000/api/blockchain/store-document-hash/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file_path: `verified_${file.name}`,        // Assuming file is already saved in `verified_con/`
+          document_name: file.name,     // or any display name you prefer
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        alert("✅ Uploaded to blockchain successfully!");
+        console.log("Blockchain response:", data);
+      } else {
+        alert("❌ Failed to upload to blockchain: " + (data?.detail || "Unknown error"));
+      }
+    } catch (error) {
+      alert("❌ Upload error: " + error.message);
+    }
   };
+  
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gray-50">
