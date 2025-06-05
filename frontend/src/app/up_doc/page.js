@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { FiArrowRight } from 'react-icons/fi'; // Arrow icon
+import { FaFileUpload, FaBook, FaFileContract } from 'react-icons/fa';
 
 export default function Doc() {
   const [fileName, setFileName] = useState('');
@@ -53,12 +54,16 @@ export default function Doc() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-gray-50">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center">
-        Upload Your Documentation (.docx)
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-gray-50 via-blue-100 to-purple-200 overflow-hidden">
+
+      {/* Background glow effects */}
+      <div className="absolute top-[-120px] left-[-80px] w-[300px] h-[300px] bg-purple-300 opacity-30 rounded-full blur-3xl z-0"></div>
+      <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-blue-300 opacity-30 rounded-full blur-3xl z-0"></div>
+
+      <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-800 relative z-10">
+        Upload Your Documentation <span className="text-purple-600">(.docx)</span>
       </h1>
 
-      {/* Hidden File Input */}
       <input
         type="file"
         accept=".docx"
@@ -67,34 +72,35 @@ export default function Doc() {
         className="hidden"
       />
 
-      {/* Upload Button */}
       <button
         onClick={handleUploadClick}
-        className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition-colors text-base sm:text-lg"
+        className="bg-purple-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-purple-700 transition transform hover:scale-105 relative z-10"
       >
-        Upload .docx
+        Select Documentation
       </button>
 
-      {/* Uploaded File Preview */}
       {fileName && (
-        <div className="mt-6 flex flex-col items-center space-y-4 w-full max-w-md">
-          <div className="flex items-center space-x-3 bg-white px-4 py-3 rounded shadow w-full">
-            <span className="text-2xl sm:text-3xl">📄</span>
+        <div className="mt-10 flex flex-col items-center space-y-6 w-full max-w-md relative z-10">
+
+          {/* File Card */}
+          <div className="flex items-center bg-white/70 backdrop-blur-md px-5 py-4 rounded-xl shadow-md w-full space-x-4 border border-gray-300">
+            <FaFileUpload className="text-purple-600 text-2xl" />
             <p className="text-gray-700 text-sm sm:text-base truncate">{fileName}</p>
           </div>
 
-          {/* Arrow to Proceed */}
+          {/* Proceed Button */}
           <button
             onClick={processDocx}
-            className="text-blue-600 hover:text-blue-800 transition-transform transform hover:scale-110"
-            title="Proceed to next step"
+            className="bg-white hover:bg-blue-100 text-blue-700 border border-blue-500 px-5 py-2 rounded-full transition transform hover:scale-105 flex items-center space-x-2"
           >
-            <FiArrowRight size={32} />
+            <span>Proceed</span>
+            <FiArrowRight size={20} />
           </button>
-          {loading && (
-          <p className="mt-4 text-blue-600 text-sm sm:text-base">Processing document...</p>
-          )}
 
+          {/* Loading Message */}
+          {loading && (
+            <p className="text-sm text-blue-600 animate-pulse">Processing document...</p>
+          )}
         </div>
       )}
     </div>
