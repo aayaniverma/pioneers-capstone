@@ -1,186 +1,109 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+import uuid
+from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
 from docx import Document
-import shutil
+from openai import OpenAI
 import os
-from io import BytesIO
+import shutil
 import traceback
+import json
 
 router = APIRouter()
 
 UPLOAD_FOLDER = "./output_contracts"
 VERIFIED_FOLDER = "./verified_con"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(VERIFIED_FOLDER, exist_ok=True)
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-if not os.path.exists(VERIFIED_FOLDER):
-    os.makedirs(VERIFIED_FOLDER)
+client = OpenAI(api_key="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")
+
 
 def extract_text_from_docx(docx_path):
-    # docx_path should be a path string, not a file object
     doc = Document(docx_path)
-    return "\n".join(para.text for para in doc.paragraphs)
+    return "\n".join(para.text.strip() for para in doc.paragraphs if para.text.strip())
 
-def verify_contract_guidelines(context):
-    errors = []
-
-    # 1. Mandatory Party Information
-    if not context.get("Full_Name_Company_A") or not context.get("Full_Name_Company_B"):
-        errors.append("Missing full legal names for one or both companies.")
-    if not context.get("Address_A") or not context.get("Address_B"):
-        errors.append("Missing address for one or both companies.")
-    if not context.get("Jurisdiction_A") or not context.get("Jurisdiction_B"):
-        errors.append("Missing jurisdiction for one or both companies.")
-
-    # 2. Contract Metadata
-    if not context.get("Date"):
-        errors.append("Missing effective date.")
-    if context.get("Governing_Law") and not any(state in context["Governing_Law"] for state in ["Karnataka", "Maharashtra", "Delhi"]):
-        errors.append("Governing law must be Karnataka, Maharashtra, or Delhi.")
-    if not context.get("Closing_Date"):
-        errors.append("Missing closing date.")
-
-    # 3. Merger or Acquisition Specifics
-    if not context.get("Share_Exchange_Ratio") and not context.get("Cash_Per_Share"):
-        errors.append("Either Share Exchange Ratio or Cash Per Share must be specified.")
-
-    if context.get("Share_Exchange_Ratio"):
-        try:
-            ratio = int(context["Share_Exchange_Ratio"])
-            if not (1 <= ratio <= 100):
-                errors.append("Share Exchange Ratio must be between 1 and 100.")
-        except ValueError:
-            errors.append("Invalid Share Exchange Ratio format.")
-
-    if context.get("Cash_Per_Share"):
-        try:
-            cash = float(context["Cash_Per_Share"].replace(",", ""))
-            if cash <= 1.0:
-                errors.append("Cash Per Share must be greater than $1.00.")
-        except ValueError:
-            errors.append("Invalid Cash Per Share format.")
-
-    # 4. Survival Clauses
-    if context.get("Warranty_Survival_Years"):
-        try:
-            survival = int(context["Warranty_Survival_Years"])
-            if survival < 1:
-                errors.append("Warranty survival period must be at least 1 year.")
-        except ValueError:
-            errors.append("Invalid warranty survival format.")
-    else:
-        errors.append("Missing warranty survival period.")
-
-    # 5. Dispute Resolution
-    if context.get("Arbitration_Organization"):
-        allowed_orgs = ["ICC", "SIAC", "LCIA"]
-        if not any(org.lower() in context["Arbitration_Organization"].lower() for org in allowed_orgs):
-            errors.append("Arbitration organization must be ICC, SIAC, or LCIA.")
-    else:
-        errors.append("Missing arbitration organization.")
-
-    if not context.get("Arbitration_Location"):
-        errors.append("Missing arbitration location.")
-
-    # 6. Signatory Requirements
-    if not context.get("Signatory_Name_A") or not context.get("Signatory_Name_B"):
-        errors.append("Missing signatory names.")
-    if not context.get("Signatory_Title_A") or not context.get("Signatory_Title_B"):
-        errors.append("Missing signatory titles.")
-
-    allowed_titles = ["CEO", "CFO", "Director", "Authorized Signatory"]
-    for title_key in ["Signatory_Title_A", "Signatory_Title_B"]:
-        if context.get(title_key) and not any(role.lower() in context[title_key].lower() for role in allowed_titles):
-            errors.append(f"Invalid title for {title_key}. Must be one of: {', '.join(allowed_titles)}.")
-
-    return errors if errors else ["✅ Contract passed all guideline checks."]
-
-
-# --- Main script ---
-
-# Use your full absolute path here:
-#output_contracts = "D:/spaceeeee/pioneers-capstone/backend/output_contracts/generated_contract.docx"
-
-# Extract raw contract text from docx file path
-#contract_text = extract_text_from_docx(output_contracts)
-
-# Your function to parse structured context from contract text
-def extract_context_from_text(text):
-    # Replace with your actual extraction logic
-    return {
-        "Full_Name_Company_A": "Company Alpha Pvt. Ltd.",
-        "Full_Name_Company_B": "Company Beta Inc.",
-        "Address_A": "Bangalore",
-        "Address_B": "Mumbai",
-        "Jurisdiction_A": "India",
-        "Jurisdiction_B": "India",
-        "Date": "2025-05-21",
-        "Governing_Law": "Karnataka",
-        "Closing_Date": "2025-06-30",
-        "Share_Exchange_Ratio": "10",
-        "Cash_Per_Share": "",
-        "Warranty_Survival_Years": "2",
-        "Arbitration_Organization": "ICC",
-        "Arbitration_Location": "Delhi",
-        "Signatory_Name_A": "Riya Mathur",
-        "Signatory_Title_A": "CEO",
-        "Signatory_Name_B": "John Doe",
-        "Signatory_Title_B": "CFO"
-    }
-
-# Extract structured context from raw contract text
-#context = extract_context_from_text(contract_text)
-
-# Run contract guideline verification
-#verification_results = verify_contract_guidelines(context)
-
-# Print verification results
-#for result in verification_results:
- #   print(result)
-@router.post("/verify-contract")
-async def verify_contract(file: UploadFile = File(...)):
-    # Save uploaded file temporarily in output_contracts
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-    # Step 2: Generate custom filename like myfile_uploaded.docx
-    original_name = file.filename
-    base_name, ext = os.path.splitext(original_name)
-    custom_name = f"{base_name}_uploaded{ext}"
-    upload_path = os.path.join(UPLOAD_FOLDER, custom_name)
+def ai_verify_contract(contract_text):
+    prompt = (
+    "You are a strict legal contract verification expert.\n"
+    "Analyze the following M&A contract and validate whether the following required sections exist and contain non-placeholder values (no 'N/A', 'TBD', or empty):\n"
+    "1. Acquirer name and address\n"
+    "2. Seller name and address\n"
+    "3. Jurisdiction for both parties\n"
+    "4. Effective Date\n"
+    "5. Closing Date\n"
+    "6. Governing Law\n"
+    "7. Purchase Price or Payment Method\n"
+    "8. Warranty Survival Period\n"
+    "9. Arbitration Organization and Location\n"
+    "10. Signatory Names and Titles\n\n"
+    "Instructions:\n"
+    "- Return a strict JSON object only.\n"
+    "- If ALL fields are present and valid, return:\n"
+    "{ \"status\": \"Verified\", \"issues\": [] }\n"
+    "- If ANY field is missing or contains placeholder/blank values, return:\n"
+    "{ \"status\": \"Not Verified\", \"issues\": [ { \"field\": \"...\", \"issue\": \"...\", \"suggestion\": \"...\" } ] }\n\n"
+    f"Contract:\n{contract_text}"
+)
 
     try:
-        with open(upload_path, "wb") as buffer:
-            buffer.write(await file.read())
-        file.file.close()    
-
-        # Extract text and context
-        contract_text = extract_text_from_docx(upload_path)
-        context = extract_context_from_text(contract_text)
-
-        # Run verification
-        results = verify_contract_guidelines(context)
-
-        if results and not results[0].startswith("✅"):
-            os.remove(upload_path)
-            return JSONResponse(status_code=400, content={"success": False, "errors": results})
-
-        # If passed, move to verified folder
-        verified_filename = f"verified_{original_name}"
-        verified_path = os.path.join(VERIFIED_FOLDER, verified_filename)
-        shutil.move(upload_path, verified_path)
-
+        response = client.chat.completions.create(
+            model="gpt-4",
+            temperature=0.2,
+            messages=[
+                {"role": "system", "content": "You are a legal contract verification assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        reply = response.choices[0].message.content
+        return json.loads(reply)
+    except Exception as e:
         return {
-            "success": True,
-            "message": "Contract verified successfully.",
-            "verified_file": verified_filename,
-            "results": results
+            "status": "Not Verified",
+            "issues": [{
+                "field": "OpenAI",
+                "issue": "Failed to parse or receive a valid response",
+                "suggestion": str(e)
+            }]
         }
 
+@router.post("/verify-contract")
+async def verify_contract(file: UploadFile = File(...)):
+    # Save uploaded file with a unique name to avoid WinError 32
+    unique_name = f"{uuid.uuid4().hex}_{file.filename}"
+    upload_path = os.path.join(UPLOAD_FOLDER, unique_name)
+
+    try:
+        # Ensure safe file writing
+        contents = await file.read()
+        with open(upload_path, "wb") as buffer:
+            buffer.write(contents)
+        file.file.close()
+
+        # Extract text
+        contract_text = extract_text_from_docx(upload_path)
+
+        # Run OpenAI check
+        ai_result = ai_verify_contract(contract_text)
+
+        if ai_result.get("status") == "Verified":
+            verified_path = os.path.join(VERIFIED_FOLDER, f"verified_{file.filename}")
+            shutil.move(upload_path, verified_path)
+            return {
+                "success": True,
+                "verification_status": "Verified",
+                "message": "All required fields appear valid.",
+                "verified_file": f"verified_{file.filename}"
+            }
+
+        # If not verified
+        os.remove(upload_path)
+        return JSONResponse(status_code=200, content={
+            "success": False,
+            "verification_status": "Not Verified",
+            "field_level_errors": ai_result.get("issues", []),
+            "raw_analysis": ai_result
+        })
+
     except Exception as e:
-        traceback.print_exc()  # <- Add this line to log full traceback
-        if os.path.exists(upload_path):
-            try:
-                os.remove(upload_path)
-            except Exception:
-                pass
+        traceback.print_exc()
         return JSONResponse(status_code=500, content={"success": False, "errors": [str(e)]})

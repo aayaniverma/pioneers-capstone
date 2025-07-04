@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { FaFileUpload, FaKeyboard, FaSave, FaFileContract } from 'react-icons/fa';
 import mammoth from 'mammoth';
+import styles from './styles.module.css';
 
 export default function Notes() {
   const fileInputRef = useRef(null);
@@ -109,7 +110,8 @@ export default function Notes() {
       <h1 className="text-3xl font-bold text-center mb-10 text-purple-800">Notes to Documentation</h1>
 
       {/* Stepper */}
-      <div className="flex justify-center items-center mb-10">
+      <div className="flex justify-center items-center mb-10 pb-30 ">
+
       {stepTitles.map((title, idx) => (
           <div key={idx} className="flex items-center">
             <div
@@ -136,23 +138,77 @@ export default function Notes() {
 
       {/* Step 1: Input Choice */}
       {step === 1 && (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-wrap justify-center gap-30 mb-8">
           <button
-            onClick={() => {
-              setInputType('type');
-              setStep(2);
-            }}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow"
+      onClick={() => {
+        setInputType('type');
+        setStep(2);
+      }}
+      className={styles.saveButton}
+    >
+      <div className={styles.svgWrapper1}>
+        <div className={styles.svgWrapper}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 640 512"
+            width="30"
+            height="30"
+            className={styles.icon}
           >
-            <FaKeyboard /> Type Notes
-          </button>
+            <path
+              d="M592 64H48C21.49 64 0 85.49 0 112v288c0 26.5 21.49 48 48 
+                 48h544c26.5 0 48-21.5 48-48V112c0-26.51-21.5-48-48-48zM128 
+                 224c0 8.8-7.2 16-16 16s-16-7.2-16-16v-32c0-8.8 7.2-16 
+                 16-16s16 7.2 16 16v32zm64 0c0 8.8-7.2 16-16 
+                 16s-16-7.2-16-16v-32c0-8.8 7.2-16 
+                 16-16s16 7.2 16 16v32zm64 0c0 8.8-7.2 
+                 16-16 16s-16-7.2-16-16v-32c0-8.8 
+                 7.2-16 16-16s16 7.2 16 16v32zm64 0c0 
+                 8.8-7.2 16-16 16s-16-7.2-16-16v-32c0-8.8 
+                 7.2-16 16-16s16 7.2 16 16v32zm64 0c0 
+                 8.8-7.2 16-16 16s-16-7.2-16-16v-32c0-8.8 
+                 7.2-16 16-16s16 7.2 16 16v32zm64 0c0 
+                 8.8-7.2 16-16 16s-16-7.2-16-16v-32c0-8.8 
+                 7.2-16 16-16s16 7.2 16 16v32zm-320 
+                 64h256c8.8 0 16 7.2 16 
+                 16s-7.2 16-16 16H192c-8.8 0-16-7.2-16-16s7.2-16 
+                 16-16zm384 32H448c-8.8 0-16-7.2-16-16s7.2-16 
+                 16-16h128c8.8 0 16 7.2 16 16s-7.2 16-16 16z"
+              
+            />
+          </svg>
+        </div>
+      </div>
+      <span>Type Notes</span>
+    </button>
 
-          <button
-            onClick={handleUploadClick}
-            className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 shadow"
+    {/* Upload Button */}
+    <button
+      onClick={handleUploadClick}
+      className={styles.saveButton}
+    >
+      <div className={styles.svgWrapper1}>
+        <div className={styles.svgWrapper}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="30"
+            height="30"
+            className={styles.icon}
           >
-            <FaFileUpload /> Upload .docx File
-          </button>
+            <path
+              d="M22,15.04C22,17.23 20.24,19 18.07,19H5.93C3.76,19 
+                 2,17.23 2,15.04C2,13.07 3.43,11.44 5.31,11.14C5.28,11 
+                 5.27,10.86 5.27,10.71C5.27,9.33 6.38,8.2 7.76,8.2C8.37,8.2 
+                 8.94,8.43 9.37,8.8C10.14,7.05 11.13,5.44 13.91,5.44C17.28,5.44 
+                 18.87,8.06 18.87,10.83C18.87,10.94 18.87,11.06 18.86,11.17C20.65,11.54 
+                 22,13.13 22,15.04Z"
+            ></path>
+          </svg>
+        </div>
+      </div>
+      <span>Upload File</span>
+    </button>
 
           <input type="file" accept=".docx" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
         </div>
@@ -160,22 +216,35 @@ export default function Notes() {
 
       {/* Step 2: Note Input or File Summary */}
       {step === 2 && (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 -mt-20">
           {inputType === 'type' ? (
             <>
               
-              <textarea
-                className="w-full max-w-2xl h-60 p-4 border border-gray-400 rounded-md shadow-sm"
-                placeholder="Type your notes here..."
+              <div className={styles.container}>
+                <textarea
+                  required
+                  name="text"
+                 className={`${styles.input} ${styles.notesInput}`}
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
               />
-              <button
-                onClick={handleGenerate}
-                className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700"
-              >
-                Generate Document
-              </button>
+              <label className={styles.label}>Type your notes...</label>
+                   </div>
+                   <button className="continue-application " onClick={handleGenerate} >
+  <div>
+    <div className="pencil"></div>
+    <div className="folder">
+      <div className="top">
+        <svg viewBox="0 0 24 27">
+          <path d="M1,0 L23,0 C23.5522847,-1.01453063e-16 24,0.44771525 24,1 L24,8.17157288 C24,8.70200585 23.7892863,9.21071368 23.4142136,9.58578644 L20.5857864,12.4142136 C20.2107137,12.7892863 20,13.2979941 20,13.8284271 L20,26 C20,26.5522847 19.5522847,27 19,27 L1,27 C0.44771525,27 6.76353751e-17,26.5522847 0,26 L0,1 C-6.76353751e-17,0.44771525 0.44771525,1.01453063e-16 1,0 Z"></path>
+        </svg>
+      </div>
+      <div className="paper"></div>
+    </div>
+  </div>
+  Generate Document
+</button>
+
             </>
           ) : (
             <>

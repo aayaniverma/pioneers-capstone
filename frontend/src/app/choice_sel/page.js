@@ -1,10 +1,40 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaFileUpload, FaBook, FaFileContract } from 'react-icons/fa';
+import * as THREE from 'three';
 
 export default function Choice() {
   const router = useRouter();
+  const vantaRef = useRef(null);
+  const [vantaEffect, setVantaEffect] = useState(null);
+
+  useEffect(() => {
+    if (!vantaEffect) {
+      import('vanta/dist/vanta.fog.min').then((VANTA) => {
+        const effect = VANTA.default({
+          el: vantaRef.current,
+          THREE: THREE,
+          mouseControls: true,
+  touchControls: true,
+  gyroControls: false,
+  minHeight: 200.00,
+  minWidth: 200.00,
+  highlightColor: 0xffc748,
+  midtoneColor: 0xf26f5c,
+            lowlightColor: 0x5339d1,
+            blurFactor: 0.58,
+            speed: 0.40
+        });
+        setVantaEffect(effect);
+      });
+    }
+
+    return () => {
+      if (vantaEffect) vantaEffect.destroy();
+    };
+  }, [vantaEffect]);
 
   const choices = [
     {
@@ -31,18 +61,16 @@ export default function Choice() {
   ];
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-6 py-10 overflow-hidden bg-gradient-to-br from-gray-50 to-blue-100">
+    <div ref={vantaRef} className="relative min-h-screen flex items-center justify-center px-6 py-10 overflow-hidden ">
       {/* Blurry background blobs */}
-      <div className="absolute top-[-120px] left-[-80px] w-[300px] h-[300px] bg-purple-300 opacity-30 rounded-full blur-3xl z-0"></div>
-      <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-blue-300 opacity-30 rounded-full blur-3xl z-0"></div>
-
+      
 
       <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl items-start h-[400px]">
         {choices.map((choice, index) => (
           <div
             key={index}
             onClick={() => router.push(choice.path)}
-            className="group bg-white hover:bg-gradient-to-r from-green-50 to-green-100 shadow-xl hover:shadow-2xl rounded-3xl p-6 border border-gray-200 hover:border-green-400 transition-all duration-300 cursor-pointer relative transform hover:-translate-y-1"
+            className="group bg-white/40 hover:bg-white/50  hover:bg-gradient-to-r from-green-50 to-green-60 shadow-xl hover:shadow-2xl rounded-3xl p-6 border border-gray-200 hover:border-green-400 transition-all duration-300 cursor-pointer relative transform hover:-translate-y-1"
           >
             <div className="flex items-center space-x-4">
               <div>{choice.icon}</div>
