@@ -20,7 +20,6 @@ export default function Home() {
     const handleScroll = () => {
       setScrolled(window.scrollY > window.innerHeight - 100);
     };
-
     handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -55,7 +54,7 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section with Parallax */}
-      <Parallax speed={-10}>
+      <Parallax scale={[1, 1.3]} opacity={[1, 0.3]} speed={-15}>
         <div ref={heroRef} className="w-screen h-screen relative overflow-hidden">
           {hasMounted && (
             <video
@@ -132,97 +131,73 @@ export default function Home() {
       <div className="mt-24" />
 
       {/* Sections */}
-      {[
-        {
-          id: "how-it-works",
-          content: (
-            <>
-              <motion.h2
-                className="text-4xl font-semibold mb-20 text-[#083254]"
-                initial={{ y: -50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                How it works?
-              </motion.h2>
-              <motion.div
-                className="w-full px-[5%] grid grid-cols-1 md:grid-cols-3 gap-24 items-start mt-12"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={{
-                  hidden: {},
-                  visible: {
-                    transition: {
-                      staggerChildren: 0.3,
-                    },
+      {[{ id: "how-it-works", content: (
+          <>
+            <motion.h2
+              className="text-4xl font-semibold mb-20 text-[#083254]"
+              initial={{ y: -50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              How it works?
+            </motion.h2>
+            <motion.div
+              className="w-full px-[5%] grid grid-cols-1 md:grid-cols-3 gap-24 items-start mt-12"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.3,
                   },
-                }}
-              >
-                {[
-                  {
-                    img: '/how1.png',
-                    title: 'Choose Your Input',
-                    desc: 'Type your notes or upload a DOCX file. AI will understand your input.',
-                  },
-                  {
-                    img: '/how2.png',
-                    title: 'AI-Based Generation',
-                    desc: 'Our engine converts inputs to legal docs and contracts instantly.',
-                  },
-                  {
-                    img: '/how3.png',
-                    title: 'Verify & Add to Blockchain',
-                    desc: 'Finalize and secure your contract with blockchain verification.',
-                  },
-                ].map((step, i) => (
-                  <motion.div key={i} className="flex items-center justify-center flex-col text-center px-6 min-h-[50vh]">
-                    <motion.img
-                      src={step.img}
-                      alt={step.title}
-                      className="w-40 h-40 -mt-4 mb-15"
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                      viewport={{ once: true }}
-                    />
-                    <motion.h3
-                      className="font-bold text-2xl"
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.4 }}
-                      viewport={{ once: true }}
-                    >
-                      {step.title}
-                    </motion.h3>
-                    <motion.p
-                      className="text-gray-600 text-m mt-2"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ duration: 0.4, delay: 0.6 }}
-                      viewport={{ once: true }}
-                    >
-                      {step.desc}
-                    </motion.p>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </>
-          ),
-        },
-        {
-          id: "why-us",
-          content: <WhyUsSection />,
-        },
-        {
-          id: "feedback",
-          content: (
+                },
+              }}
+            >
+              {[{ img: '/how1.png', title: 'Choose Your Input', desc: 'Type your notes or upload a DOCX file. AI will understand your input.' },
+                { img: '/how2.png', title: 'AI-Based Generation', desc: 'Our engine converts inputs to legal docs and contracts instantly.' },
+                { img: '/how3.png', title: 'Verify & Add to Blockchain', desc: 'Finalize and secure your contract with blockchain verification.' }].map((step, i) => (
+                <motion.div key={i} className="flex items-center justify-center flex-col text-center px-6 min-h-[50vh]">
+                  <motion.img
+                    src={step.img}
+                    alt={step.title}
+                    className="w-40 h-40 -mt-4 mb-15"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    viewport={{ once: true }}
+                  />
+                  <motion.h3
+                    className="font-bold text-2xl"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    viewport={{ once: true }}
+                  >
+                    {step.title}
+                  </motion.h3>
+                  <motion.p
+                    className="text-gray-600 text-m mt-2"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.4, delay: 0.6 }}
+                    viewport={{ once: true }}
+                  >
+                    {step.desc}
+                  </motion.p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </>
+        ) },
+        { id: "why-us", content: <WhyUsSection /> },
+        { id: "feedback", content: (
             <p className="italic text-gray-700">
               “LEXENATE saved us hours in legal paperwork. Super intuitive and reliable!” — A. Verma
             </p>
-          ),
-        },
+        ) },
       ].map((section, i) => (
         <motion.section
           key={section.id}
