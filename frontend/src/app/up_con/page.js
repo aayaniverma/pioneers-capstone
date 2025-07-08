@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { FiArrowRight } from 'react-icons/fi';
-import { FaFileUpload, FaBook, FaFileContract } from 'react-icons/fa';
+import { FaFileUpload, FaFileContract } from 'react-icons/fa';
 
 export default function Cont() {
   const [fileName, setFileName] = useState('');
@@ -19,7 +18,8 @@ export default function Cont() {
     if (selectedFile && selectedFile.name.endsWith('.docx')) {
       setFileName(selectedFile.name);
       setFile(selectedFile);
-      setIsVerified(false); // Reset if new file uploaded
+      setIsVerified(false);
+      setVerificationResult(null);
     } else {
       alert('Please upload a valid .docx file.');
       setFileName('');
@@ -46,15 +46,22 @@ export default function Cont() {
         body: formData,
       });
 
-      if (res.ok) {
-        const data = await res.json();
+      const data = await res.json();
+
+      if (data.success) {
         setVerificationResult({ success: true, message: data.message });
         setIsVerified(true);
         alert("✅ Verified successfully!");
       } else {
-        const errData = await res.json();
-        setVerificationResult({ success: false, errors: errData.errors });
+        const fieldErrors = data.field_level_issues
+          ? Object.entries(data.field_level_issues).map(
+            ([key, val]) => `${key}: ${val.issue}`
+            )
+          : data.errors || ['Verification failed.'];
+
+        setVerificationResult({ success: false, errors: fieldErrors });
         setIsVerified(false);
+        alert("❌ Not Verified. Check field-level issues.");
       }
     } catch (error) {
       setVerificationResult({ success: false, errors: [error.message] });
@@ -66,7 +73,7 @@ export default function Cont() {
 
   const uploadToBlockchain = async () => {
     if (!file) return;
-  
+
     try {
       const res = await fetch('http://localhost:8000/api/blockchain/store-document-hash/', {
         method: 'POST',
@@ -74,13 +81,13 @@ export default function Cont() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          file_path: `verified_${file.name}`,        // Assuming file is already saved in `verified_con/`
-          document_name: file.name,     // or any display name you prefer
+          file_path: `verified_${file.name}`,
+          document_name: file.name,
         }),
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok) {
         alert("✅ Uploaded to blockchain successfully!");
         console.log("Blockchain response:", data);
@@ -91,7 +98,6 @@ export default function Cont() {
       alert("❌ Upload error: " + error.message);
     }
   };
-  
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-gray-50 via-blue-100 to-purple-200 overflow-hidden">

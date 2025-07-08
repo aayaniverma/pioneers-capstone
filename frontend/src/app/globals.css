@@ -20,7 +20,27 @@
 }
 
 body {
-  background: #fffffc;
+  background: #e9edf7;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto; /* allow scroll */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* Internet Explorer 10+ */
+}
+/* global.css or tailwind.css */
+.writing-vertical {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
