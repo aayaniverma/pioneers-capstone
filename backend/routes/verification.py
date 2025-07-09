@@ -1,79 +1,138 @@
 import uuid
+import os
+import shutil
+import json
+import traceback
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
 from docx import Document
 from openai import OpenAI
-import os
-import shutil
-import traceback
-import json
 
 router = APIRouter()
 
+# Folder setup
 UPLOAD_FOLDER = "./output_contracts"
 VERIFIED_FOLDER = "./verified_con"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(VERIFIED_FOLDER, exist_ok=True)
 
-client = OpenAI(api_key="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")
-
-
+# OpenAI GPT-4 API Key (secure this in production!)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Extract text from .docx
 def extract_text_from_docx(docx_path):
     doc = Document(docx_path)
     return "\n".join(para.text.strip() for para in doc.paragraphs if para.text.strip())
 
+# GPT-4 Contract Validation
 def ai_verify_contract(contract_text):
     prompt = (
-    "You are a strict legal contract verification expert.\n"
-    "Analyze the following M&A contract and validate whether the following required sections exist and contain non-placeholder values (no 'N/A', 'TBD', or empty):\n"
-    "1. Acquirer name and address\n"
-    "2. Seller name and address\n"
-    "3. Jurisdiction for both parties\n"
-    "4. Effective Date\n"
-    "5. Closing Date\n"
-    "6. Governing Law\n"
-    "7. Purchase Price or Payment Method\n"
-    "8. Warranty Survival Period\n"
-    "9. Arbitration Organization and Location\n"
-    "10. Signatory Names and Titles\n\n"
-    "Instructions:\n"
-    "- Return a strict JSON object only.\n"
-    "- If ALL fields are present and valid, return:\n"
-    "{ \"status\": \"Verified\", \"issues\": [] }\n"
-    "- If ANY field is missing or contains placeholder/blank values, return:\n"
-    "{ \"status\": \"Not Verified\", \"issues\": [ { \"field\": \"...\", \"issue\": \"...\", \"suggestion\": \"...\" } ] }\n\n"
-    f"Contract:\n{contract_text}"
+    "You are a legal contract structure validator. Your job is to verify whether specific fields are structurally present in a given M&A contract — regardless of whether the actual data is filled in.\n\n"
+
+    "Your ONLY goal is to confirm the **presence of the field reference**, not the value.\n\n"
+
+    "✅ A field is VALID if:\n"
+    "- The field appears in any form, including:\n"
+    "   • A placeholder like `{{ Total_Amount }}`\n"
+    "   • A label like `Name: ________` or `Title:` even if blank\n"
+    "   • A clearly associated sentence (e.g., 'The Seller shall deliver the Assets on the Closing Date')\n"
+    "- It may use alternate terms (e.g., 'Buyer' = 'Acquirer')\n"
+
+    "❌ A field is INVALID only if:\n"
+    "- There is NO mention of the field at all in any form — no label, no reference, no placeholder\n"
+    "🔒 Important Rule:\n"
+    "- Each field must be checked **independently**. Do not let the presence or absence of one field influence the others.\n"
+    "- For example, even if Signatory Name B is missing, that does NOT affect the validity of Governing Law or Closing Date.\n"
+    "- Only mark a field as invalid if it is **explicitly missing** — no mention, no label, no placeholder.\n"
+    
+    "Examples:\n"
+    "- 'Payment: {{ Total_Amount }}' ✅ valid (placeholder)\n"
+    "- 'Title: __________' ✅ valid (labeled)\n"
+    "- 'Payment shall be delivered on the date specified herein.' ✅ valid\n"
+    "- No mention of governing law anywhere ❌ invalid\n\n"
+
+    "Now check this contract for the following fields:\n"
+    "1. Acquirer Name\n"
+    "2. Acquirer Address\n"
+    "3. Seller Name\n"
+    "4. Seller Address\n"
+    "5. Jurisdiction of Acquirer\n"
+    "6. Jurisdiction of Seller\n"
+    "7. Effective Date\n"
+    "8. Closing Date\n"
+    "9. Governing Law\n"
+    "10. Payment Method or Purchase Price\n"
+    "11. Signatory Name A\n"
+    "12. Signatory Title A\n"
+    "13. Signatory Name B\n"
+    "14. Signatory Title B\n\n"
+
+    "You MUST assume all placeholders or labels (even blank) are valid field references.\n\n"
+
+    "Respond ONLY in this JSON format:\n"
+    "{\n"
+    "  \"status\": \"Verified\" or \"Not Verified\",\n"
+    "  \"fields\": {\n"
+    "    \"Acquirer Name\": {\"valid\": true/false, \"issue\": \"...\", \"suggestion\": \"...\"},\n"
+    "    ... (14 fields total) ...\n"
+    "  },\n"
+    "  \"summary\": \"One-line summary stating if all fields are structurally present\"\n"
+    "}\n\n"
+
+    "Now analyze this contract and return only the JSON:\n\n"
+    f"{contract_text}"
 )
 
     try:
         response = client.chat.completions.create(
             model="gpt-4",
-            temperature=0.2,
+            temperature=0,
             messages=[
-                {"role": "system", "content": "You are a legal contract verification assistant."},
+                {"role": "system", "content": "You are a legal compliance assistant."},
                 {"role": "user", "content": prompt}
             ]
         )
-        reply = response.choices[0].message.content
-        return json.loads(reply)
+
+        reply = response.choices[0].message.content.strip()
+        print("🔍 GPT RAW REPLY:\n", reply)
+
+        # Try to parse response
+        try:
+            result = json.loads(reply)
+            fields = result.get("fields", {})
+            invalid_fields = [k for k, v in fields.items() if not v.get("valid", False)]
+
+            if invalid_fields:
+                result["status"] = "Not Verified"
+                result["summary"] = f"Missing or invalid fields: {', '.join(invalid_fields)}"
+            else:
+                result["status"] = "Verified"
+                result["summary"] = "All required fields are valid."
+
+            return result
+
+        except json.JSONDecodeError:
+            return {
+                "status": "Not Verified",
+                "summary": "OpenAI returned invalid JSON.",
+                "fields": {},
+                "raw": reply
+            }
+
     except Exception as e:
         return {
             "status": "Not Verified",
-            "issues": [{
-                "field": "OpenAI",
-                "issue": "Failed to parse or receive a valid response",
-                "suggestion": str(e)
-            }]
+            "summary": "OpenAI API failed",
+            "fields": {},
+            "error": str(e)
         }
 
+# Upload Endpoint
 @router.post("/verify-contract")
 async def verify_contract(file: UploadFile = File(...)):
-    # Save uploaded file with a unique name to avoid WinError 32
     unique_name = f"{uuid.uuid4().hex}_{file.filename}"
     upload_path = os.path.join(UPLOAD_FOLDER, unique_name)
 
     try:
-        # Ensure safe file writing
         contents = await file.read()
         with open(upload_path, "wb") as buffer:
             buffer.write(contents)
@@ -82,7 +141,7 @@ async def verify_contract(file: UploadFile = File(...)):
         # Extract text
         contract_text = extract_text_from_docx(upload_path)
 
-        # Run OpenAI check
+        # Run GPT analysis
         ai_result = ai_verify_contract(contract_text)
 
         if ai_result.get("status") == "Verified":
@@ -91,19 +150,23 @@ async def verify_contract(file: UploadFile = File(...)):
             return {
                 "success": True,
                 "verification_status": "Verified",
-                "message": "All required fields appear valid.",
+                "message": ai_result.get("summary", ""),
                 "verified_file": f"verified_{file.filename}"
             }
 
-        # If not verified
+        # Not Verified
         os.remove(upload_path)
         return JSONResponse(status_code=200, content={
             "success": False,
             "verification_status": "Not Verified",
-            "field_level_errors": ai_result.get("issues", []),
-            "raw_analysis": ai_result
+            "field_level_issues": ai_result.get("fields", {}),
+            "summary": ai_result.get("summary", ""),
+            "raw_output": ai_result
         })
 
     except Exception as e:
         traceback.print_exc()
-        return JSONResponse(status_code=500, content={"success": False, "errors": [str(e)]})
+        return JSONResponse(status_code=500, content={
+            "success": False,
+            "errors": [str(e)]
+        })
