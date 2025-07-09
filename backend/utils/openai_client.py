@@ -10,7 +10,7 @@ API_KEY = "sk-or-v1-5548fdfe40712280a909a2837d855242497709e0dc2de3c792c5e0bf4216
 def generate_output(prompt):
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "HTTP-Referer": "https://yourdomain.com",  # Replace with your site or email
+        "Referer": "https://yourdomain.com",  # Replace with your site or email
         "Content-Type": "application/json"
     }
 
