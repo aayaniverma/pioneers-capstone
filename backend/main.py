@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import blockchain_routes
 from routes import html_to_docx
 from fastapi.staticfiles import StaticFiles
+from routes import verification
+
 
 
 
