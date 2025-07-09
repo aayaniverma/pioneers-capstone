@@ -81,7 +81,8 @@ export default function Cont() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          file_path: `verified_${file.name}`,
+          file_path: `verified_${file.name}`,  // ✅ use backticks
+
           document_name: file.name,
         }),
       });
@@ -101,8 +102,6 @@ export default function Cont() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-gray-50 via-blue-100 to-purple-200 overflow-hidden">
-
-      {/* Background glow effects */}
       <div className="absolute top-[-120px] left-[-80px] w-[300px] h-[300px] bg-purple-300 opacity-30 rounded-full blur-3xl z-0"></div>
       <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-blue-300 opacity-30 rounded-full blur-3xl z-0"></div>
 
@@ -128,13 +127,11 @@ export default function Cont() {
       {fileName && (
         <div className="mt-10 flex flex-col items-center space-y-6 w-full max-w-md relative z-10">
 
-          {/* File Card */}
           <div className="flex items-center bg-white/70 backdrop-blur-md px-5 py-4 rounded-xl shadow-md w-full space-x-4 border border-gray-300">
             <FaFileContract className="text-purple-600 text-2xl" />
             <p className="text-gray-700 text-sm sm:text-base truncate">{fileName}</p>
           </div>
 
-          {/* Verification Button */}
           {!isVerified && (
             <button
               onClick={verifyContract}
@@ -145,7 +142,6 @@ export default function Cont() {
             </button>
           )}
 
-          {/* Upload Button */}
           {isVerified && (
             <button
               onClick={uploadToBlockchain}
@@ -155,14 +151,24 @@ export default function Cont() {
             </button>
           )}
 
-          {/* Result message */}
           {verificationResult && (
-            <div className={`mt-2 text-center text-sm font-medium px-4 py-2 rounded ${
-              verificationResult.success ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
-            }`}>
+            <div
+              className={`mt-2 text-center text-sm font-medium px-4 py-2 rounded w-full ${
+                verificationResult.success
+                  ? 'text-green-700 bg-green-100'
+                  : 'text-red-700 bg-red-100'
+              }`}
+            >
               {verificationResult.success
                 ? verificationResult.message
-                : verificationResult.errors?.join(', ') || 'Verification failed.'}
+                : 'Contract is not verified. Please fix the following issues:'}
+              {!verificationResult.success && verificationResult.errors && (
+                <ul className="text-left mt-2 space-y-1 text-sm">
+                  {verificationResult.errors.map((err, i) => (
+                    <li key={i}>• {err}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>

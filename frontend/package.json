@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@tiptap/react": "^2.22.3",
-    "@tiptap/starter-kit": "^2.22.3",
+    "@tiptap/extension-highlight": "^2.25.0",
+    "@tiptap/extension-text-align": "^2.25.0",
+    "@tiptap/react": "^2.25.0",
+    "@tiptap/starter-kit": "^2.25.0",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.23.0",
     "html-docx-js": "^0.3.1",
+    "lucide-react": "^0.525.0",
     "mammoth": "^1.9.1",
     "next": "15.3.2",
     "react": "^19.0.0",

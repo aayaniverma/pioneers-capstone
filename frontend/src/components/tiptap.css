@@ -1,0 +1,75 @@
+.tiptap {
+    height: 100%;
+    overflow-y: auto;
+    outline: none;
+    padding-right: 4px;
+  
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .tiptap:focus {
+    outline: none;
+  }
+  
+  /* Hide scrollbars for all browsers */
+  .tiptap::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Ensure content text is visible */
+  .tiptap * {
+    color: #111;
+  }
+  
+  /* Typography */
+  .tiptap p {
+    margin-bottom: 1rem;
+  }
+  
+  .tiptap ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  
+  .tiptap ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  
+  .tiptap li {
+    margin-bottom: 0.25rem;
+  }
+  
+  .tiptap h1, .tiptap h2, .tiptap h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .tiptap h1 { font-size: 1.5rem; }
+  .tiptap h2 { font-size: 1.25rem; }
+  .tiptap h3 { font-size: 1.125rem; }
+  
+  .tiptap blockquote {
+    border-left: 4px solid #ccc;
+    padding-left: 1rem;
+    font-style: italic;
+    color: #666;
+    margin: 1rem 0;
+  }
+  
+  .tiptap mark {
+    background-color: #fce96a;
+    padding: 0.1rem 0.25rem;
+    border-radius: 0.25rem;
+  }
+  
+  .tiptap hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
+  }
+  

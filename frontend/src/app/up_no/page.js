@@ -81,43 +81,33 @@ export default function MultiStepForm() {
 
         {step === 1 && (
           <Step1
-            setInputType={setInputType}
-            setStep={(nextStep) => {
-              setMaxStepReached(Math.max(maxStepReached, nextStep));
-              setStep(nextStep);
-            }}
-            handleFileChange={(e) => {
-              const selected = e.target.files?.[0];
-              if (selected && selected.name.endsWith('.docx')) {
-                setFile(selected);
-                setFileName(selected.name);
-                setInputType('upload');
-                setMaxStepReached(Math.max(maxStepReached, 2));
-                setStep(2);
-              } else {
-                alert('Only .docx files are supported.');
-              }
-            }}
-            fileInputRef={fileInputRef}
-          />
-        )}
+          setInputType={setInputType}
+          setStep={(nextStep) => {
+            setMaxStepReached(Math.max(maxStepReached, nextStep));
+            setStep(nextStep);
+          }}
+        />
+      )}
 
         {step === 2 && (
-          <Step2
-            inputType={inputType}
-            noteText={noteText}
-            setNoteText={setNoteText}
-            file={file}
-            fileName={fileName}
-            setStep={(nextStep) => {
-              setMaxStepReached(Math.max(maxStepReached, nextStep));
-              setStep(nextStep);
-            }}
-            setDocContent={setDocContent}
-            setLoading={setLoading}
-            loading={loading}
-          />
-        )}
+            <Step2
+              inputType={inputType}
+              noteText={noteText}
+              setNoteText={setNoteText}
+              file={file}
+              setFile={setFile}
+              fileName={fileName}
+              setFileName={setFileName}
+              setStep={(nextStep) => {
+                setMaxStepReached(Math.max(maxStepReached, nextStep));
+                setStep(nextStep);
+              }}
+              setDocContent={setDocContent}
+              setLoading={setLoading}
+              loading={loading}
+              fileInputRef={fileInputRef}
+            />
+          )}
 
         {step === 3 && (
           <Step3
