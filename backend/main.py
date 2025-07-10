@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import doc_generator, contract_generator, verification
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import blockchain_routes

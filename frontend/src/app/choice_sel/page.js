@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaFileUpload, FaBook, FaFileContract } from 'react-icons/fa';
+import { FaFileUpload, FaBook, FaFileContract, FaCloudUploadAlt } from 'react-icons/fa';
 
 export default function Choice() {
   const router = useRouter();
@@ -30,10 +30,16 @@ export default function Choice() {
       description: 'Start with your existing documentation. We convert it into a compliant smart contract, validate it for accuracy and structure, and then deploy it to the blockchain with complete transparency and traceability.',
     },
     {
-      title: 'Upload Contract',
+      title: 'Verify Contract',
       icon: <FaFileContract className="text-purple-600 text-xl" />,
       path: '/up_con',
-      description: 'Already have a smart contract ready? Upload it for a thorough validation process. Once verified, the contract is securely published to the blockchain, ensuring trust and immutability.',
+      description: 'Already have a smart contract ready? Upload it for a thorough validation process.',
+    },
+    {
+      title: 'Upload To Blockchain',
+      icon: <FaCloudUploadAlt className="text-purple-600 text-xl" />,
+      path: '/upload',
+      description: 'Push your finalized document directly to the blockchain. Ensure tamper-proof integrity and gain an immutable public record of your contract execution.',
     },
   ];
 
@@ -42,7 +48,7 @@ export default function Choice() {
       {/* Main Box with 5% margin on all sides */}
       <div className="w-[95%] h-[90%] flex rounded-xl overflow-hidden shadow-lg bg-white">
         {/* Left Side - 45% */}
-        <div className="w-[55%] relative">
+        <div className="w-[40%] relative">
           {isClient && (
             <video
               ref={videoRef}
@@ -70,24 +76,24 @@ export default function Choice() {
         </div>
 
         {/* Right Side - 55% */}
-        <div className="w-[45%] bg-[#F1F8FE] flex flex-col justify-center items-center ">
-        <div className="grid grid-rows-3 gap-25 w-full max-w-xl h-[450px]">
+        <div className="w-[60%] bg-[#F1F8FE] flex flex-col justify-center items-center ">
+        <div className="grid grid-rows-3 mb-25 gap-35 w-full max-w-3xl h-[400px]">
 
           {choices.map((choice, index) => (
     <div
       key={index}
       onClick={() => router.push(choice.path)}
-      className="group cursor-pointer border border-gray-300 rounded-lg bg-white hover:border-indigo-400 transition-all duration-300 overflow-hidden h-[70px] hover:h-[150px]"
+      className="group cursor-pointer border border-gray-300 rounded-lg bg-white hover:border-indigo-400 transition-all duration-300 overflow-hidden h-[50px] hover:h-[120px]"
     >
       {/* Fixed Top Row */}
-      <div className="flex items-center space-x-4 p-5">
+      <div className="flex items-center space-x-4 p-2">
         {choice.icon}
         <span className="text-gray-800 font-medium text-lg">{choice.title}</span>
       </div>
 
       {/* Expanding Description */}
-      <div className="px-3 pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <p className="text-m text-black-600">{choice.description}</p>
+      <div className="px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <p className="text-s text-black-600">{choice.description}</p>
       </div>
     </div>
   ))}

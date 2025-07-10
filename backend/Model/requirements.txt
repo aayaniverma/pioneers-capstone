@@ -1,0 +1,8 @@
+torch>=2.0.0
+transformers>=4.38.0
+datasets>=2.18.0
+docxtpl>=0.16.7
+python-docx>=0.8.11
+tqdm>=4.66.0
+scikit-learn>=1.4.0
+numpy>=1.24.0

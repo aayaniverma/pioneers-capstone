@@ -36,3 +36,34 @@ backend/venv/
 *.avi
 *.mov
 *.psd
+
+# Model files and large binaries
+*.safetensors
+*.pt
+*.bin
+*.pth
+
+# Tokenizer and training files
+tokenizer_config.json
+tokenizer.json
+special_tokens_map.json
+training_args.bin
+trainer_state.json
+config.json
+
+# Logs and temp data
+events.out.tfevents.*
+*.log
+*.json
+
+# Folder-level ignores
+backend/Model/contract_qa_model/
+backend/Model/logs/
+backend/temp/
+__pycache__/
+*.pyc
+
+# System & environment
+.DS_Store
+.env
+

@@ -47,8 +47,8 @@ export default function Home() {
         </div>
 
         <div className="space-x-6 text-2xl -mt-1 mr-10 text-[#083254]">
-          <a href="#how-it-works" className="hover:text-[#3db8da]">How it works</a>
-          <a href="#why-us" className="hover:text-[#3db8da]">Why us</a>
+          <a href="#how-it-works" className="hover:text-[#3db8da]">How it works?</a>
+          <a href="#why-us" className="hover:text-[#3db8da]">Why us?</a>
           <a href="#feedback" className="hover:text-[#3db8da]">Feedback</a>
         </div>
       </motion.nav>
