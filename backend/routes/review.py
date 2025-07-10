@@ -1,4 +1,4 @@
-import uuid.py
+import uuid
 import os
 import shutil
 import json

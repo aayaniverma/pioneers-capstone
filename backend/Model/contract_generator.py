@@ -62,16 +62,16 @@ class PreservePlaceholder(Undefined):
 jinja_env = Environment(undefined=PreservePlaceholder)
 
 # Paths
-PREDICTIONS_PATH = "predictions.json"
+#PREDICTIONS_PATH = "predictions.json"
 TEMPLATE_FOLDER = "templates"
 TEMPLATE_MERGER = os.path.join(TEMPLATE_FOLDER, "merger_template.docx")
 TEMPLATE_ACQUISITION = os.path.join(TEMPLATE_FOLDER, "acquisition_template.docx")
-OUTPUT_DIR = "../temp/tempcon"
+OUTPUT_DIR = "/temp/tempcon"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Load predictions
-with open(PREDICTIONS_PATH, "r") as f:
-    predictions = json.load(f)
+#with open(PREDICTIONS_PATH, "r") as f:
+  #  predictions = json.load(f)
 
 # Normalize Q&A keys like "What is the Date?" → "Date"
 def normalize_question(q):
@@ -92,16 +92,13 @@ def infer_agreement_type(field_values):
     return "acquisition"
 
 # Process each prediction
-for doc_name, qna in tqdm(predictions.items(), desc="Generating contracts"):
-    context = {normalize_question(k): v.strip() for k, v in qna.items() if v.strip()}
-
-    agreement_type = infer_agreement_type(qna)
-    template_path = TEMPLATE_MERGER if agreement_type == "merger" else TEMPLATE_ACQUISITION
-
-    doc = DocxTemplate(template_path)
-    doc.render(context, jinja_env=jinja_env)
-
-    output_file = os.path.join(OUTPUT_DIR, f"{doc_name.replace('.docx', '')}_contract.docx")
-    doc.save(output_file)
-
-print(f"✅ All contracts generated at: {OUTPUT_DIR}")
+def generate_contract(predictions: dict):
+    for doc_name, qna in predictions.items():
+        context = {normalize_question(k): v.strip() for k, v in qna.items() if v.strip()}
+        agreement_type = infer_agreement_type(qna)
+        template_path = TEMPLATE_MERGER if agreement_type == "merger" else TEMPLATE_ACQUISITION
+        doc = DocxTemplate(template_path)
+        doc.render(context, jinja_env=jinja_env)
+        output_path = os.path.join(OUTPUT_DIR, f"{doc_name.replace('.docx', '')}_contract.docx")
+        doc.save(output_path)
+        return output_path 

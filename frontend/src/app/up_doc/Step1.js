@@ -31,20 +31,21 @@ export default function Step1({
   const processDocx = async () => {
     if (!file) return;
     setLoading(true);
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+    formData.append("guideline_path", "guidelines/nda_ma_guidelines.md");
+  
     try {
       const res = await fetch("http://localhost:8000/api/generate-contract/", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!res.ok) throw new Error("Failed to process document");
-
-      const data = await res.json(); // optional: { message, filename }
-      setGeneratedFilename?.(data.filename); // in case needed in Step 2
+  
+      const data = await res.json();  // ✅ this is valid again
+      setGeneratedFilename?.(data.filename); 
       setStep(1);
     } catch (error) {
       alert(error.message);

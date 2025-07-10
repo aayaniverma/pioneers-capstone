@@ -123,9 +123,11 @@ from pathlib import Path
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering
 import re
 from tqdm import tqdm
+from Model.contract_generator import generate_contract
 
 # Load model and tokenizer
-model_path = "contract_qa_model"
+model_path = os.path.join(os.path.dirname(__file__), "contract_qa_model")
+
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 model = AutoModelForQuestionAnswering.from_pretrained(model_path)
 model.eval()
@@ -217,9 +219,8 @@ def predict_answer(question, context):
     return answer
 
 # Run for all test documents
-results = {}
-for file_path in tqdm(test_docs_path.glob("*.docx")):
-    context = extract_text(file_path)
+def run_model_pipeline(doc_path):
+    context = extract_text(doc_path)
     sig_fallbacks = extract_signatories(context)
     qa_output = {}
 
@@ -229,12 +230,8 @@ for file_path in tqdm(test_docs_path.glob("*.docx")):
         else:
             qa_output[question] = predict_answer(question, context)
 
-    results[file_path.name] = qa_output
+    predictions = {os.path.basename(doc_path): qa_output}
+    output_path = generate_contract(predictions)
+    return output_path
 
-# Save results
-output_file = "predictions.json"
-with open(output_file, "w") as f:
-    json.dump(results, f, indent=2)
-
-print(f"✅ Predictions saved to {output_file}")
 

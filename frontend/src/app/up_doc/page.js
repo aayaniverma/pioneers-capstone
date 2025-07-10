@@ -7,7 +7,7 @@ import Step3 from './Step3';
 export default function MultiStepDocToContractForm() {
   const fileInputRef = useRef(null);
 
-  const [step, setStep] = useState(3);
+  const [step, setStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('');

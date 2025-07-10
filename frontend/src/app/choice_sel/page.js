@@ -41,6 +41,12 @@ export default function Choice() {
       path: '/upload',
       description: 'Push your finalized document directly to the blockchain. Ensure tamper-proof integrity and gain an immutable public record of your contract execution.',
     },
+    {
+      title: 'Verify Blockchain Integrity',
+      icon: <FaCloudUploadAlt className="text-purple-600 text-xl" />,
+      path: '/verify-choice',
+      description: '"Upload your contract along with either a receipt or your email to verify whether the document has been tampered with or is authentically stored on the blockchain.',
+    },
   ];
 
   return (
@@ -77,13 +83,13 @@ export default function Choice() {
 
         {/* Right Side - 55% */}
         <div className="w-[60%] bg-[#F1F8FE] flex flex-col justify-center items-center ">
-        <div className="grid grid-rows-3 mb-25 gap-35 w-full max-w-3xl h-[400px]">
+        <div className="grid grid-rows-3  gap-30 w-full max-w-3xl h-[500px]">
 
           {choices.map((choice, index) => (
     <div
       key={index}
       onClick={() => router.push(choice.path)}
-      className="group cursor-pointer border border-gray-300 rounded-lg bg-white hover:border-indigo-400 transition-all duration-300 overflow-hidden h-[50px] hover:h-[120px]"
+      className="expand-card group cursor-pointer border border-gray-300 rounded-lg bg-white hover:border-indigo-400 transition-all duration-300"
     >
       {/* Fixed Top Row */}
       <div className="flex items-center space-x-4 p-2">

@@ -1,3 +1,4 @@
+from routes import contract_gen
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
@@ -6,7 +7,7 @@ from routes import blockchain_routes
 from routes import html_to_docx
 from fastapi.staticfiles import StaticFiles
 
-from routes import doc_generator, contract_generator, review, html_to_docx, blockchain_routes, verification
+from routes import doc_generator, review, html_to_docx, verification
 
 app = FastAPI()
 
@@ -22,7 +23,7 @@ app.add_middleware(
 )
 app.include_router(blockchain_routes.router, prefix="/api/blockchain", tags=["blockchain"])
 app.include_router(doc_generator.router, prefix="/api")
-app.include_router(contract_generator.router, prefix="/api")
+app.include_router(contract_gen.router, prefix="/api")
 app.include_router(verification.router, prefix="/api")
 app.include_router(html_to_docx.router, prefix="/api")
-app.include_router(review.router, prefix="/api/review")
+app.include_router(review.router, prefix="/api")
