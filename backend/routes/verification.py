@@ -39,11 +39,7 @@ def ai_verify_contract(contract_text):
 
     "❌ A field is INVALID only if:\n"
     "- There is NO mention of the field at all in any form — no label, no reference, no placeholder\n"
-    "🔒 Important Rule:\n"
-    "- Each field must be checked **independently**. Do not let the presence or absence of one field influence the others.\n"
-    "- For example, even if Signatory Name B is missing, that does NOT affect the validity of Governing Law or Closing Date.\n"
-    "- Only mark a field as invalid if it is **explicitly missing** — no mention, no label, no placeholder.\n"
-    
+
     "Examples:\n"
     "- 'Payment: {{ Total_Amount }}' ✅ valid (placeholder)\n"
     "- 'Title: __________' ✅ valid (labeled)\n"
