@@ -1,4 +1,3 @@
-# backend/utils/email_utils.py
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -6,8 +5,8 @@ from email.mime.text import MIMEText
 import os
 
 def send_email_with_receipt(to_email, pdf_path, subject="Your Blockchain Receipt"):
-    from_email = os.getenv("EMAIL_USER")
-    email_password = os.getenv("EMAIL_PASS")
+    from_email = os.getenv("EMAIL_USER")  # e.g., your Brevo-registered email
+    email_password = os.getenv("EMAIL_PASS")  # Your Brevo SMTP key
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -22,7 +21,8 @@ def send_email_with_receipt(to_email, pdf_path, subject="Your Blockchain Receipt
         part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(pdf_path))
         msg.attach(part)
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    # ✅ Use Brevo SMTP settings
+    with smtplib.SMTP("smtp-relay.brevo.com", 587) as server:
         server.starttls()
         server.login(from_email, email_password)
         server.send_message(msg)
