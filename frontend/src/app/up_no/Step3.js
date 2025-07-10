@@ -1,14 +1,16 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react'; // ✅ add useEffect
+import mammoth from 'mammoth';  
 import RichTextEditor from '../../components/RichTextEditor';
 
 export default function Step3({ filename, docContent, setDocContent, setStep }) {
   useEffect(() => {
     const loadDoc = async () => {
-      const res = await fetch(`http://localhost:8000/temp/temp_doc/${filename}`);
+      const res = await fetch(`http://localhost:8000/temp/tempdoc/${filename}`);
       const blob = await res.blob();
       const arrayBuffer = await blob.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+
       setDocContent(result.value);
     };
     loadDoc();

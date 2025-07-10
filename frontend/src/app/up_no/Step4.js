@@ -8,34 +8,34 @@ export default function Step4({ filename }) {
   const handleProceed = () => {
     window.location.href = '/up_doc';
   };
+  const pdfUrl = `http://localhost:8000/temp/tempdoc/${pdfFile}`;
+
+
 
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="bg-white w-full max-w-4xl p-6 rounded-md shadow">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Final Document Preview</h2>
 
-        {pdfFile ? (
-          <object
-            data={`http://localhost:8000/temp/tempdoc/${pdfFile}`}
-            type="application/pdf"
-            width="100%"
-            height="800px"
+          <iframe
+          src={pdfUrl}
+          width="100%"
+          height="800px"
+          title="PDF Preview"
+          style={{ border: '1px solid #ccc', borderRadius: '4px' }}
+        />
+
+        <p className="text-sm text-gray-600 mt-2">
+          If the preview doesn't appear, you can{' '}
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-blue-600"
           >
-            <p className="text-red-500">
-              PDF preview not supported.{' '}
-              <a
-                href={`http://localhost:8000/temp/tempdoc/${pdfFile}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-600"
-              >
-                Download PDF
-              </a>
-            </p>
-          </object>
-        ) : (
-          <p className="text-gray-500">No file found for preview.</p>
-        )}
+            download the PDF here
+          </a>.
+        </p>
       </div>
 
       <button

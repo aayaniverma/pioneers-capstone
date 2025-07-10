@@ -20,49 +20,46 @@ export default function Step2({
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      let finalFilename = '';
-
+      let finalFile = null;
+  
       if (inputType === 'type') {
+        // 1. Generate .docx from typed text
         const formData = new FormData();
         formData.append('user_text', noteText);
         formData.append('filename', 'typed_notes.docx');
-
+  
         const res = await fetch('http://localhost:8000/api/html_to_docx/', {
           method: 'POST',
           body: formData,
         });
-
+  
         if (!res.ok) throw new Error('Failed to generate .docx from text');
         const data = await res.json();
-        finalFilename = data.file_path.split('/').pop();
+        const filePath = data.file_path;
+  
+        // 2. Fetch the .docx file back as a blob
+        const fileBlob = await fetch(`http://localhost:8000/${filePath}`).then(r => r.blob());
+        finalFile = new File([fileBlob], 'typed_notes.docx');
       } else {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const res = await fetch('http://localhost:8000/api/upload_docx/', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error('File upload failed');
-        const data = await res.json();
-        finalFilename = data.file_path.split('/').pop();
+        // Use uploaded file directly
+        finalFile = file;
       }
-
+  
+      // 3. Send the actual file to /generate-document/
       const genForm = new FormData();
-      genForm.append('filename', finalFilename);
+      genForm.append('file', finalFile);
       genForm.append('guideline_path', 'guidelines/nda_ma_guidelines.md');
-
+  
       const res2 = await fetch('http://localhost:8000/api/generate-document/', {
         method: 'POST',
         body: genForm,
       });
-
+  
       if (!res2.ok) throw new Error('Document generation failed');
       const blob = await res2.blob();
       const arrayBuffer = await blob.arrayBuffer();
       const result = await mammoth.extractRawText({ arrayBuffer });
-
+  
       setDocContent(result.value);
       setStep(3);
     } catch (err) {
@@ -71,7 +68,7 @@ export default function Step2({
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="flex flex-col left-5 mt-3 items-center gap-6">
       {inputType === 'type' ? (

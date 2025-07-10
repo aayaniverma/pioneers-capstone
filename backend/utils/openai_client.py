@@ -1,31 +1,28 @@
 import os
-import requests
+from dotenv import load_dotenv
+import openai
 
+# ✅ Load .env variables
+load_dotenv()
 
-# Set your OpenRouter API key here
-API_KEY = "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"
+# ✅ Secure API key
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    raise ValueError("OPENAI_API_KEY environment variable is not set.")
 
+# ✅ Configure OpenAI client for >= 1.0
+client = openai.OpenAI(api_key=API_KEY)
 
-
-def generate_output(prompt):
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Referer": "https://yourdomain.com",  # Replace with your site or email
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "model": "mistralai/mistral-7b-instruct",  # or "openchat/openchat-3.5-0106"
-        "messages": [
-            {"role": "system", "content": "You are a helpful legal document assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": 0.3
-    }
-
-    response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        raise Exception(f"Error: {response.status_code} - {response.text}")
+def generate_output(prompt: str) -> str:
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",  # or "gpt-4.0", if needed
+            messages=[
+                {"role": "system", "content": "You are a helpful legal document assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        raise RuntimeError(f"OpenAI API error: {e}")

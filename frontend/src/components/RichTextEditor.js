@@ -37,17 +37,19 @@ const MenuBar = ({ editor }) => {
 };
 
 export default function RichTextEditor({ docContent, setDocContent }) {
-    const editor = useEditor({
-      extensions: [
-        StarterKit,
-        Highlight,
-        TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      ],
-      content: docContent,
-      onUpdate: ({ editor }) => {
-        setDocContent(editor.getHTML())
-      },
-    })
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Highlight,
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+    ],
+    content: docContent,
+    onUpdate: ({ editor }) => {
+      setDocContent(editor.getHTML());
+    },
+    immediatelyRender: false, // 🔥 this resolves SSR hydration error
+  });
+
   
     useEffect(() => {
       if (editor && docContent !== editor.getHTML()) {

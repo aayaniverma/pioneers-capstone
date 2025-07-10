@@ -23,7 +23,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 router = APIRouter()
 @router.post("/generate-document/")
 async def generate_document(file: UploadFile = File(...), guideline_path: str = Form(...)):
-    input_path = f"temp/tempno/{file.filename}"
+    input_path = os.path.join("temp", "tempno", os.path.basename(file.filename))
+
     output_filename = file.filename.replace(".docx", "_structured.docx")
     output_path = f"temp/tempdoc/{output_filename}"
     pdf_output_path = output_path.replace(".docx", ".pdf")
