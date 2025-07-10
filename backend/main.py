@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import blockchain_routes
 from routes import html_to_docx
 from fastapi.staticfiles import StaticFiles
+from routes import up_doc_to_con
 
 
 
@@ -24,3 +25,4 @@ app.include_router(doc_generator.router, prefix="/api")
 app.include_router(contract_generator.router, prefix="/api")
 app.include_router(verification.router, prefix="/api")
 app.include_router(html_to_docx.router, prefix="/api")
+app.include_router(up_doc_to_con.router, prefix="/api")

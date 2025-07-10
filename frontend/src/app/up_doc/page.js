@@ -1,108 +1,111 @@
 'use client';
-
 import { useState, useRef } from 'react';
-import { FiArrowRight } from 'react-icons/fi'; // Arrow icon
-import { FaFileUpload, FaBook, FaFileContract } from 'react-icons/fa';
+import Step1 from './Step1';
+import Step2 from './Step2';
+import Step3 from './Step3';
 
-export default function Doc() {
-  const [fileName, setFileName] = useState('');
-  const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+export default function MultiStepDocToContractForm() {
   const fileInputRef = useRef(null);
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files?.[0];
+  const [step, setStep] = useState(3);
+  const [maxStepReached, setMaxStepReached] = useState(1);
+  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [docContent, setDocContent] = useState('');
+  const [generatedFilename, setGeneratedFilename] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    if (selectedFile && selectedFile.name.endsWith('.docx')) {
-      setFileName(selectedFile.name);
-      setFile(selectedFile);
-    } else {
-      alert('Please upload a valid .docx file.');
-      setFileName('');
-      setFile(null);
-    }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const processDocx = async () => {
-    if (!file) return;
-    setLoading(true);
-  
-    const formData = new FormData();
-    formData.append("file", file);
-  
-    try {
-      const res = await fetch("http://localhost:8000/api/generate-contract/", {
-        method: "POST",
-        body: formData,
-      });
-  
-      if (!res.ok) {
-        throw new Error("Failed to process document");
-      }
-  
-      const data = await res.json();
-      alert(data.message);
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const stepTitles = ['Upload Documentation', 'Edit Contract', 'Finalize & Export'];
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-gradient-to-br from-gray-50 via-blue-100 to-purple-200 overflow-hidden">
+    <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar Stepper */}
+      <div className="w-1.5/5 bg-[#1e293b] text-white p-8">
+  <h2 className="text-2xl font-semibold mb-25">Notes To Documentation</h2>
 
-      {/* Background glow effects */}
-      <div className="absolute top-[-120px] left-[-80px] w-[300px] h-[300px] bg-purple-300 opacity-30 rounded-full blur-3xl z-0"></div>
-      <div className="absolute bottom-[-100px] right-[-100px] w-[300px] h-[300px] bg-blue-300 opacity-30 rounded-full blur-3xl z-0"></div>
-
-      <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-800 relative z-10">
-        Upload Your Documentation <span className="text-purple-600">(.docx)</span>
-      </h1>
-
-      <input
-        type="file"
-        accept=".docx"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
-
-      <button
-        onClick={handleUploadClick}
-        className="bg-purple-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-purple-700 transition transform hover:scale-105 relative z-10"
-      >
-        Select Documentation
-      </button>
-
-      {fileName && (
-        <div className="mt-10 flex flex-col items-center space-y-6 w-full max-w-md relative z-10">
-
-          {/* File Card */}
-          <div className="flex items-center bg-white/70 backdrop-blur-md px-5 py-4 rounded-xl shadow-md w-full space-x-4 border border-gray-300">
-            <FaFileUpload className="text-purple-600 text-2xl" />
-            <p className="text-gray-700 text-sm sm:text-base truncate">{fileName}</p>
+  <div className="relative ml-6">
+    {/* Vertical dashed line */}
+   
+    {stepTitles.map((title, idx) => {
+      const isActive = step === idx + 1;
+      const isVisited = maxStepReached >= idx + 1;
+      return (
+        <div key={idx} className="relative flex items-center gap-4 mb-27 z-10">
+          {/* Step circle */}
+          <div
+            className={`
+              w-6 h-6 rounded-full flex items-center justify-center text-sm font-semibold
+              border-2
+              ${isActive
+                ? 'border-white text-white bg-[#1e293b] '
+                : isVisited
+                ? 'border-gray-400 text-gray-500 bg-gray-300'
+                : 'border-gray-400 text-gray-500 bg-[#1e293b]'}
+            `}
+          >
+            {idx + 1}
           </div>
 
-          {/* Proceed Button */}
+          {/* Step title */}
           <button
-            onClick={processDocx}
-            className="bg-white hover:bg-blue-100 text-blue-700 border border-blue-500 px-5 py-2 rounded-full transition transform hover:scale-105 flex items-center space-x-2"
+            onClick={() => {
+              if (isVisited) setStep(idx + 1);
+            }}
+            disabled={!isVisited}
+            className={`
+              text-left text-sm font-medium transition-colors duration-200
+              ${isActive
+                ? 'text-white'
+                : isVisited
+                ? 'text-gray-300 hover:underline'
+                : 'text-gray-500 cursor-not-allowed'}
+            `}
           >
-            <span>Proceed</span>
-            <FiArrowRight size={20} />
+            {title}
           </button>
-
-          {/* Loading Message */}
-          {loading && (
-            <p className="text-sm text-blue-600 animate-pulse">Processing document...</p>
-          )}
         </div>
+      );
+    })}
+  </div>
+</div>
+
+
+      {/* Main Step Content */}
+      <div className="relative w-3/4 p-10 z-10">
+      <div className="relative z-10">
+      {step === 1 && (
+        <Step1
+          file={file}
+          setFile={setFile}
+          fileName={fileName}
+          setFileName={setFileName}
+          setGeneratedFilename={setGeneratedFilename}
+          setStep={setStep}
+          fileInputRef={fileInputRef}
+          setLoading={setLoading}
+          loading={loading}
+        />
       )}
+      {step === 2 && (
+        <Step2
+          filename={generatedFilename}
+          docContent={docContent}
+          setDocContent={setDocContent}
+          setStep={setStep}
+        />
+      )}
+      {step === 3 && (
+        <Step3
+          filename={generatedFilename}
+        />
+      )}
+    </div>
+      <img
+    src="/note.png"
+    alt="decor"
+    className="absolute bottom-5 opacity-70 right-0 w-[700px] h-[700px] z-0 pointer-events-none select-none"
+  />
+</div>
     </div>
   );
 }
