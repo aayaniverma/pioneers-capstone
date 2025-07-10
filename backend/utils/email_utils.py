@@ -1,37 +1,47 @@
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.mime.text import MIMEText
 import os
+import requests
+import base64
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def send_email_with_receipt(to_email, pdf_path, subject="Your Blockchain Receipt"):
-    from_email = os.getenv("EMAIL_USER")
-    email_password = os.getenv("EMAIL_PASS")
+    api_key = os.getenv("RESEND_API_KEY")
+    if not api_key:
+        raise ValueError("RESEND_API_KEY not set in environment")
 
-    if not from_email or not email_password:
-        raise ValueError("EMAIL_USER or EMAIL_PASS not set in environment")
-
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-
-    body = "Attached is your blockchain receipt. This proves your contract was securely uploaded and recorded."
-    msg.attach(MIMEText(body, 'plain'))
-
+    # Read and encode the PDF in base64
     with open(pdf_path, "rb") as f:
-        part = MIMEApplication(f.read(), _subtype="pdf")
-        part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(pdf_path))
-        msg.attach(part)
+        pdf_data = base64.b64encode(f.read()).decode("utf-8")
 
-    try:
-        with smtplib.SMTP("smtp-relay.brevo.com", 587) as server:
-            server.starttls()
-            server.login(from_email, email_password)
-            server.send_message(msg)
-    except Exception as e:
-        print(f"❌ Email send failed: {e}")
-        raise e
+    # Prepare the email payload
+    payload = {
+        "from": "Blockchain Receipts <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": subject,
+        "html": "<p>Attached is your blockchain receipt. This proves your contract was securely uploaded and recorded.</p>",
+        "attachments": [
+            {
+                "filename": os.path.basename(pdf_path),
+                "content": pdf_data,
+                "type": "application/pdf"
+            }
+        ]
+    }
+
+    # Send the email
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        json=payload
+    )
+
+    # Check response
+    if response.status_code == 200:
+        print("✅ Email sent successfully.")
+    else:
+        print(f"❌ Resend failed: {response.status_code} - {response.text}")
+        raise Exception("Failed to send email via Resend")
