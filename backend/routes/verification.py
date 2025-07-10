@@ -6,7 +6,11 @@ import traceback
 from fastapi import APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
 from docx import Document
+from dotenv import load_dotenv
 from openai import OpenAI
+
+# Load environment variables
+load_dotenv()
 
 router = APIRouter()
 
@@ -16,8 +20,9 @@ VERIFIED_FOLDER = "./verified_con"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(VERIFIED_FOLDER, exist_ok=True)
 
-# OpenAI GPT-4 API Key (secure this in production!)
+# Initialize OpenAI client with API key from .env
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 # Extract text from .docx
 def extract_text_from_docx(docx_path):
     doc = Document(docx_path)
@@ -35,10 +40,10 @@ def ai_verify_contract(contract_text):
     "   • A placeholder like `{{ Total_Amount }}`\n"
     "   • A label like `Name: ________` or `Title:` even if blank\n"
     "   • A clearly associated sentence (e.g., 'The Seller shall deliver the Assets on the Closing Date')\n"
-    "- It may use alternate terms (e.g., 'Buyer' = 'Acquirer')\n"
+    "- It may use alternate terms (e.g., 'Buyer' = 'Acquirer')\n\n"
 
     "❌ A field is INVALID only if:\n"
-    "- There is NO mention of the field at all in any form — no label, no reference, no placeholder\n"
+    "- There is NO mention of the field at all in any form — no label, no reference, no placeholder\n\n"
 
     "Examples:\n"
     "- 'Payment: {{ Total_Amount }}' ✅ valid (placeholder)\n"
