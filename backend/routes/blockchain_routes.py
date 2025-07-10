@@ -1,53 +1,53 @@
 # backend/routes/blockchain_routes.py
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-import hashlib
 import os
+import hashlib
+import json
+from datetime import datetime
+from fastapi import APIRouter, UploadFile, File, Form
+from fastapi.responses import FileResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from blockchain import DocumentBlockchain
+from utils.email_utils import send_email_with_receipt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
 blockchain = DocumentBlockchain()
 
-class DocumentRequest(BaseModel):
-    file_path: str
-    document_name: str
+def generate_pdf_receipt(receipt_data, save_path):
+    c = canvas.Canvas(save_path, pagesize=letter)
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 750, "Document Blockchain Receipt")
+    c.line(100, 745, 500, 745)
+    y = 720
+    for key, value in receipt_data.items():
+        c.drawString(100, y, f"{key.replace('_', ' ').capitalize()}: {value}")
+        y -= 20
+    c.drawString(100, y - 20, "Note: This receipt confirms the file was uploaded to the blockchain.")
+    c.save()
 
 @router.post("/store-document-hash/")
-async def store_document_hash(request: DocumentRequest):
-    try:
-        # Generate hash from your existing documents
-        file_path = os.path.join("verified_con", request.file_path)
-        
-        with open(file_path, "rb") as f:
-            document_hash = hashlib.sha256(f.read()).hexdigest()
-        
-        new_block = blockchain.mine_block(document_hash, request.document_name)
-        
-        return {
-            "message": "Document hash stored in blockchain",
-            "block_index": new_block.index,
-            "document_hash": document_hash,
-            "block_hash": new_block.hash
-        }
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Document not found")
+async def store_document_hash(email: str = Form(...), file: UploadFile = File(...)):
+    file_bytes = await file.read()
+    document_hash = hashlib.sha256(file_bytes).hexdigest()
+    block = blockchain.mine_block(document_hash, email, file.filename)
+    timestamp = datetime.utcfromtimestamp(block.timestamp).isoformat()
 
-@router.get("/blockchain/")
-def get_blockchain():
-    return [{
-        "index": block.index,
-        "timestamp": block.timestamp,
-        "data": block.data,
-        "hash": block.hash
-    } for block in blockchain.chain]
+    receipt = {
+        "email": email,
+        "filename": file.filename,
+        "document_hash": document_hash,
+        "block_index": block.index,
+        "timestamp": timestamp
+    }
 
-@router.get("/verify-document/{document_hash}")
-def verify_document(document_hash: str):
-    for block in blockchain.chain[1:]:  # Skip genesis
-        if document_hash in block.data:
-            return {
-                "verified": True,
-                "block_index": block.index,
-                "timestamp": block.timestamp
-            }
-    return {"verified": False}
+    os.makedirs("receipts", exist_ok=True)
+    receipt_path = f"receipts/{document_hash}_receipt.pdf"
+    generate_pdf_receipt(receipt, receipt_path)
+
+    # Send the receipt via email
+    send_email_with_receipt(email, receipt_path)
+
+    return FileResponse(receipt_path, media_type="application/pdf", filename=f"{file.filename}_receipt.pdf")
