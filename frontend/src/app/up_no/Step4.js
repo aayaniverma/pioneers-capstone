@@ -15,7 +15,7 @@ export default function Step4({ filename }) {
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="bg-white w-full max-w-4xl p-6 rounded-md shadow">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">Final Document Preview</h2>
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">Final Documentation Preview</h2>
 
           <iframe
           src={pdfUrl}
@@ -42,7 +42,7 @@ export default function Step4({ filename }) {
         onClick={handleProceed}
         className="flex items-center gap-2 bg-yellow-500 text-black font-semibold px-5 py-2 rounded-full hover:bg-yellow-600 shadow-md"
       >
-        <FaFileContract /> Proceed to Contract
+        <FaFileContract /> Proceed to Contract Generation
       </button>
     </div>
   );

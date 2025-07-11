@@ -58,10 +58,10 @@ export default function Step1({
     <div className="flex flex-col items-center gap-6 mt-8">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6 border border-gray-200">
         <label htmlFor="file" className="block text-lg font-semibold text-center text-gray-800 mb-4">
-          Upload Contract DOCX
+          Upload Documentation (.docx)
         </label>
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-center gap-4 flex-wrap">
           <button
             type="button"
             onClick={handleUploadClick}
@@ -71,7 +71,7 @@ export default function Step1({
           </button>
 
           {fileName && (
-            <p className="text-sm text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
+            <p className="text-sm text-gray-600">
               <span className="font-medium text-gray-800">Selected:</span> {fileName}
             </p>
           )}

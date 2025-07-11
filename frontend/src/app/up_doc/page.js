@@ -21,7 +21,7 @@ export default function MultiStepDocToContractForm() {
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar Stepper */}
       <div className="w-1.5/5 bg-[#1e293b] text-white p-8">
-  <h2 className="text-2xl font-semibold mb-25">Notes To Documentation</h2>
+  <h2 className="text-2xl font-semibold mb-25">Documentation To Contract</h2>
 
   <div className="relative ml-6">
     {/* Vertical dashed line */}

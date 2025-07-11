@@ -101,9 +101,9 @@ export default function Step2({
         <>
           <div className="w-full max-w-md bg-white mt-30 rounded-lg shadow-lg p-6 border border-gray-200">
   <label htmlFor="demo-file" className="block text-lg font-semibold text-center text-gray-800 mb-4">
-    Upload DOCX File
+    Upload Notes (.docx)
   </label>
-  <div className="flex items-center justify-between gap-4 flex-wrap">
+  <div className="flex items-center justify-center gap-4 flex-wrap">
   <button
     type="button"
     onClick={() => fileInputRef.current.click()}
@@ -113,7 +113,7 @@ export default function Step2({
   </button>
 
   {fileName && (
-    <p className="text-sm text-gray-600 whitespace-nowrap">
+    <p className="text-sm text-gray-600 ">
       <span className="font-medium text-gray-800">Selected:</span> {fileName}
     </p>
   )}

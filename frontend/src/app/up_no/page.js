@@ -9,7 +9,7 @@ import Step4 from './Step4';
 export default function MultiStepForm() {
   const fileInputRef = useRef(null);
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(4);
   const [maxStepReached, setMaxStepReached] = useState(1); // NEW: Track progress
 
   const [inputType, setInputType] = useState('');

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaFileUpload, FaBook, FaFileContract, FaCloudUploadAlt } from 'react-icons/fa';
+import { FaFileUpload, FaBook, FaFileContract, FaCloudUploadAlt, FaShieldAlt } from 'react-icons/fa';
 
 export default function Choice() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export default function Choice() {
     },
     {
       title: 'Verify Blockchain Integrity',
-      icon: <FaCloudUploadAlt className="text-purple-600 text-xl" />,
+      icon: <FaShieldAlt className="text-purple-600 text-xl" />,
       path: '/verify-choice',
       description: '"Upload your contract along with either a receipt or your email to verify whether the document has been tampered with or is authentically stored on the blockchain.',
     },
@@ -81,29 +81,25 @@ export default function Choice() {
 
         </div>
 
-        {/* Right Side - 55% */}
-        <div className="w-[60%] bg-[#F1F8FE] flex flex-col justify-center items-center ">
-        <div className="grid grid-rows-3  gap-30 w-full max-w-3xl h-[500px]">
-
-          {choices.map((choice, index) => (
-    <div
-      key={index}
-      onClick={() => router.push(choice.path)}
-      className="expand-card group cursor-pointer border border-gray-300 rounded-lg bg-white hover:border-indigo-400 transition-all duration-300"
-    >
-      {/* Fixed Top Row */}
-      <div className="flex items-center space-x-4 p-2">
-        {choice.icon}
-        <span className="text-gray-800 font-medium text-lg">{choice.title}</span>
-      </div>
-
-      {/* Expanding Description */}
-      <div className="px-3 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <p className="text-s text-black-600">{choice.description}</p>
-      </div>
-    </div>
-  ))}
-</div>
+        {/* Right Section */}
+        <div className="w-[60%] bg-[#F1F8FE] flex flex-col items-center justify-center px-6 py-8">
+          <div className="grid grid-cols-2 gap-6 w-full max-w-3xl">
+            {choices.map((choice, index) => (
+              <div
+                key={index}
+                onClick={() => router.push(choice.path)}
+                className="group cursor-pointer border border-gray-200 bg-transparent rounded-xl p-4 hover:border-[#340247] border-2 transition-all duration-300"
+              >
+                <div className="flex items-center space-x-3 mb-2">
+                  {choice.icon}
+                  <span className="text-lg font-semibold text-gray-800">{choice.title}</span>
+                </div>
+                <p className="text-sm text-gray-600 group-hover:text-gray-800 transition-all">
+                  {choice.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,8 @@ from email.mime.text import MIMEText
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+dotenv_path = os.path.join(os.path.dirname(_file_), '..', '.env')
+load_dotenv(dotenv_path)
 
 def send_email_with_receipt(to_email, pdf_path, subject="Your Blockchain Receipt"):
     from_email = os.getenv("EMAIL_USER")
