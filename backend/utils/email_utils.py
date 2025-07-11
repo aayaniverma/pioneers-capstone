@@ -3,8 +3,7 @@ import requests
 import base64
 from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.dirname(_file_), '..', '.env')
-load_dotenv(dotenv_path)
+load_dotenv()
 
 def send_email_with_receipt(to_email, pdf_path, subject="Your Blockchain Receipt"):
     api_key = os.getenv("RESEND_API_KEY")

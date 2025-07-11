@@ -84,6 +84,7 @@ export default function MultiStepDocToContractForm() {
           fileInputRef={fileInputRef}
           setLoading={setLoading}
           loading={loading}
+          setDocContent={setDocContent}
         />
       )}
       {step === 2 && (

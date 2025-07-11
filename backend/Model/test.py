@@ -232,6 +232,9 @@ def run_model_pipeline(doc_path):
 
     predictions = {os.path.basename(doc_path): qa_output}
     output_path = generate_contract(predictions)
+    print(f"Returning generated path: {output_path}")
+
     return output_path
+
 
 

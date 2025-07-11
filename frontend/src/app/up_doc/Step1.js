@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import mammoth from 'mammoth';  
 
 export default function Step1({
   file,
@@ -8,6 +9,7 @@ export default function Step1({
   setFileName,
   setGeneratedFilename, // optional if needed later
   setStep,
+  setDocContent,
   setLoading,
   loading,
   fileInputRef
@@ -34,19 +36,27 @@ export default function Step1({
   
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("guideline_path", "guidelines/nda_ma_guidelines.md");
   
     try {
       const res = await fetch("http://localhost:8000/api/generate-contract/", {
-        method: "POST",
+        method: 'POST',
         body: formData,
       });
   
-      if (!res.ok) throw new Error("Failed to process document");
-  
-      const data = await res.json();  // ✅ this is valid again
-      setGeneratedFilename?.(data.filename); 
-      setStep(1);
+      if (!res.ok) throw new Error('Document generation failed');
+      const data = await res.json();
+const filename = data.docx_path.split("/").pop();  // extract only the filename
+
+// Fetch the generated .docx file
+const fileRes = await fetch(`http://localhost:8000/temp/tempcon/${filename}`);
+const fileBlob = await fileRes.blob();
+const arrayBuffer = await fileBlob.arrayBuffer();
+const result = await mammoth.extractRawText({ arrayBuffer });
+
+setGeneratedFilename(filename);  // Optional: pass to Step3
+setDocContent(result.value);
+
+      setStep(2);
     } catch (error) {
       alert(error.message);
     } finally {

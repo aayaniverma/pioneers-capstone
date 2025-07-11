@@ -66,7 +66,7 @@ jinja_env = Environment(undefined=PreservePlaceholder)
 TEMPLATE_FOLDER = "templates"
 TEMPLATE_MERGER = os.path.join(TEMPLATE_FOLDER, "merger_template.docx")
 TEMPLATE_ACQUISITION = os.path.join(TEMPLATE_FOLDER, "acquisition_template.docx")
-OUTPUT_DIR = "/temp/tempcon"
+OUTPUT_DIR = "temp/tempcon"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Load predictions
