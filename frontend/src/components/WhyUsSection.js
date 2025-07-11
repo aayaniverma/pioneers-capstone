@@ -7,26 +7,27 @@ export default function WhyUsSection() {
 
   const cards = [
     {
-      title: 'Automated & Cost Saving',
-      desc: 'Generate legal documents and contracts instantly — saving time and cost through automation.',
+      title: 'Instant Legal Automation',
+      desc: 'Draft NDAs, M&A agreements, and more in seconds — reducing legal overhead and saving thousands in legal costs.',
       img: '/wph1.png',
     },
     {
-      title: 'Custom to Your Template',
-      desc: 'LEXENATE adapts to your company’s own templates, ensuring relevance and accuracy.',
+      title: 'Tailored to Your Templates',
+      desc: 'LEXENATE adapts to your internal document formats, ensuring every contract fits your legal and brand standards.',
       img: '/wph2.png',
     },
     {
-      title: 'Contract Verification',
-      desc: 'Contracts are secured and verified through blockchain, enhancing trust and compliance.',
+      title: 'Smart Contract Validation',
+      desc: 'Built-in AI checks and verifies legal clauses, structure, and required fields for compliance — before it’s signed.',
       img: '/wph3.png',
     },
     {
-      title: 'Blockchain ',
-      desc: 'Contracts are secured and verified through blockchain, enhancing trust and compliance.',
+      title: 'Blockchain-Backed Integrity',
+      desc: 'Every contract is time-stamped, hashed, and stored on-chain, ensuring tamper-proof audit trails and legal trust.',
       img: '/wph4.png',
     },
   ];
+  
 
   // Animation Variants
   const containerVariants = {
