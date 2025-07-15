@@ -15,11 +15,24 @@ export default function Step3({ filename, docContent, setDocContent, setStep }) 
     };
     loadDoc();
   }, [filename]);
+  const handleContinue = async () => {
+    const formData = new URLSearchParams();
+    formData.append('user_text', docContent);
+    formData.append('filename', filename);
+
+    await fetch('http://localhost:8000/html_to_pdf_only/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData
+    });
+
+    setStep(3);
+  };
   return (
     <div className="flex flex-col items-center gap-4">
       <RichTextEditor docContent={docContent} setDocContent={setDocContent} />
       <button
-        onClick={() => setStep(3)}
+        onClick={handleContinue}
         className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600"
       >
         Continue to Finalize

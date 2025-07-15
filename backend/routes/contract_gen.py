@@ -22,17 +22,10 @@ async def generate_contract(file: UploadFile = File(...)):
 
     # Run ML model pipeline
     generated_path = run_model_pipeline(file_path)  # This handles test.py + contract_generator.py
-    generated_pdf_path = generated_path.replace(".docx", ".pdf")
-    try:
-        convert(generated_path, generated_pdf_path)
-    except Exception as e:
-        print(f"PDF conversion failed: {e}")
-        generated_pdf_path = None  # optional fallback
     
     return {
         "filename": os.path.basename(generated_path),
         "docx_path": f"tempcon/{os.path.basename(generated_path)}",
-    "pdf_path": f"tempcon/{os.path.basename(generated_pdf_path)}" if generated_pdf_path else None
     }
     
     

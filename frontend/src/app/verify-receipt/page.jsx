@@ -34,10 +34,27 @@ export default function VerifyReceipt() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* 🔁 Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+      >
+        <source src="/abstract_line5.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* 🔳 White translucent overlay over video */}
+      <div className="absolute top-0 left-0 w-full h-full bg-white/20 z-10" />
+
+      {/* 💬 Content Overlay */}
+      <div className="relative z-20 min-h-screen flex items-center justify-center p-6">
       <form
         onSubmit={handleVerify}
-        className="bg-white shadow-xl border border-gray-200 rounded-xl p-8 w-full max-w-md space-y-6"
+        className="bg-white/70 shadow-xl border border-gray-200 rounded-xl p-8 w-full max-w-md space-y-6"
       >
         <h2 className="text-2xl font-bold text-center text-gray-800">
           🔐 Verify Contract Using Receipt
@@ -79,9 +96,10 @@ export default function VerifyReceipt() {
             }`}
           >
             {status}
-          </p>
-        )}
-      </form>
+            </p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

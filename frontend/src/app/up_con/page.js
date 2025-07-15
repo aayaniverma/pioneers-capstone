@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function ContractVerificationFlow() {
   const [file, setFile] = useState(null);
@@ -40,30 +41,34 @@ export default function ContractVerificationFlow() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      <div className="w-full max-w-2xl mx-auto p-10">
-        <h2 className="text-2xl font-bold mb-6 text-center">Verify Contract Structure</h2>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="absolute top-0 left-0 w-full h-full object-cover z-0"
+  >
+    <source src="/abstract_line5.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  {/* 🔳 White translucent overlay over video */}
+  <div className="absolute top-0 left-0 w-full h-full bg-white/20 z-10" />
+      <div className="bg-white/70 z-10 shadow-lg border border-gray-200 rounded-xl  w-full max-w-6xl p-8 space-y-20">
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          Verify Contract Structure
+        </h1>
 
-        {/* Upload Box */}
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-          <label className="block text-lg font-semibold text-gray-800 mb-4">
-            Upload Contract (.docx)
-          </label>
-
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current.click()}
-              className="px-4 py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-100 font-medium text-sm"
-            >
-              Choose File
-            </button>
-            {fileName && (
-              <p className="text-sm text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis">
-                <span className="font-medium text-gray-800">Selected:</span> {fileName}
-              </p>
-            )}
-          </div>
+        {/* Upload Section */}
+        <div className="border border-dashed rounded-lg p-4 bg-purple/20 text-center">
+          <p className="text-gray-600 mb-3">Upload your <strong>.docx</strong> contract</p>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current.click()}
+            className="bg-purple-100 text-purple-700 px-4 py-2 rounded-md font-medium hover:bg-blue-200"
+          >
+            Choose File
+          </button>
           <input
             type="file"
             accept=".docx"
@@ -71,27 +76,39 @@ export default function ContractVerificationFlow() {
             onChange={handleFileChange}
             className="hidden"
           />
+          {fileName && (
+            <p className="mt-2 text-sm text-gray-800">
+              <span className="font-medium">Selected:</span> {fileName}
+            </p>
+          )}
         </div>
 
         {/* Verify Button */}
         <button
           onClick={verifyContract}
           disabled={!file || loading}
-          className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-full font-semibold"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-full font-semibold flex items-center justify-center gap-2"
         >
+          {loading ? <Loader2 className="animate-spin h-5 w-5" /> : null}
           {loading ? 'Verifying...' : 'Verify Contract'}
         </button>
 
         {/* Result */}
         {result && (
-          <div className="mt-8 bg-white p-6 rounded-lg shadow border">
-            <h3 className="text-xl font-semibold mb-4">Verification Result</h3>
-            <p className={`mb-2 font-bold ${result.success ? 'text-green-600' : 'text-red-600'}`}>
-              {result.message || result.summary}
-            </p>
+          <div className="bg-gray-100 p-5 rounded-md border border-gray-200">
+            <div className="flex items-center gap-2 mb-2">
+              {result.success ? (
+                <CheckCircle className="text-green-600 w-5 h-5" />
+              ) : (
+                <XCircle className="text-red-600 w-5 h-5" />
+              )}
+              <p className={`text-lg font-semibold ${result.success ? 'text-green-700' : 'text-red-700'}`}>
+                {result.message || result.summary}
+              </p>
+            </div>
 
             {!result.success && result.field_level_issues && (
-              <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
+              <ul className="list-disc ml-6 text-sm text-gray-700">
                 {Object.entries(result.field_level_issues).map(([key, value]) => (
                   <li key={key}>
                     <strong>{key}:</strong> {value.issue}

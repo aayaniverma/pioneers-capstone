@@ -16,7 +16,7 @@ export default function Step4({ filename }) {
 
         {pdfFile ? (
           <object
-            data={`http://localhost:8000/temp/tempcon/${pdfFile}`}
+            data={`http://localhost:8000/temp/temppre/${pdfFile}`}
             type="application/pdf"
             width="100%"
             height="800px"
@@ -24,7 +24,7 @@ export default function Step4({ filename }) {
             <p className="text-red-500">
               PDF preview not supported.{' '}
               <a
-                href={`http://localhost:8000/temp/tempcon/${pdfFile}`}
+                href={`http://localhost:8000/temp/temppre/${pdfFile}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline text-blue-600"

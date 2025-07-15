@@ -23,22 +23,41 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* 🔁 Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+      >
+        <source src="/abstract_line5.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* 🔳 White translucent overlay over video */}
+      <div className="absolute top-0 left-0 w-full h-full bg-white/20 z-10" />
+
+      {/* 💬 Content Overlay */}
+      <div className="relative z-20 min-h-screen flex items-center justify-center p-6">
       <form
         onSubmit={handleVerify}
-        className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md space-y-6 border border-gray-200"
+        className="bg-white/70 rounded-xl shadow-xl p-8 w-full max-w-md space-y-6 border border-gray-200"
       >
-        <h1 className="text-2xl font-bold text-center text-gray-800">Verify Contract by Email</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+            Upload Contract to Blockchain
+          </h1>
 
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium text-gray-700">Email Address</label>
+          <div className="flex flex-col space-y-2">
+            <label className="text-sm font-medium text-gray-700">Email Address</label>
           <input
             type="email"
             required
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-black-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -67,9 +86,10 @@ export default function VerifyEmail() {
             }`}
           >
             {status}
-          </p>
-        )}
-      </form>
+            </p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
