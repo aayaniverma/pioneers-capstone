@@ -28,8 +28,8 @@ export default function UploadPage() {
       link.download = `${file.name}_receipt.pdf`;
       link.click();
 
-      setStatus('✅ Uploaded & receipt downloaded,
-                📧 Email sent successfully!');
+      setStatus(`✅ Uploaded & receipt downloaded, 📧 Email sent successfully!`);
+
     } catch (err) {
       console.error(err);
       setStatus('❌ Upload failed');
