@@ -6,7 +6,7 @@ import RichTextEditor from '../../components/RichTextEditor';
 export default function Step3({ filename, docContent, setDocContent, setStep }) {
   useEffect(() => {
     const loadDoc = async () => {
-      const res = await fetch(`http://localhost:8000/temp/tempdoc/${filename}`);
+      const res = await fetch(`http://localhost:8000/temp/tempdoc/typed_notes_structured.docx`);
       const blob = await res.blob();
       const arrayBuffer = await blob.arrayBuffer();
       const result = await mammoth.convertToHtml({ arrayBuffer });

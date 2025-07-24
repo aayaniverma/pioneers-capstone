@@ -8,7 +8,7 @@ export default function Step4({ filename }) {
   const handleProceed = () => {
     window.location.href = '/up_doc';
   };
-  const pdfUrl = `http://localhost:8000/temp/temppre/${pdfFile}`;
+  const pdfUrl = `http://localhost:8000/temp/temppre/output.pdf`;
 
 
 
